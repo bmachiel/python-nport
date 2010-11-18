@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nport.citi — CITI &mdash; nport v? documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '?',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
+    <link rel="top" title="nport v? documentation" href="index.html" />
+    <link rel="up" title="Formats" href="formats.html" />
+    <link rel="next" title="nporttool — Command line nport" href="nporttool.html" />
+    <link rel="prev" title="nport.touchstone — Touchstone" href="touchstone.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="nporttool.html" title="nporttool — Command line nport"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="touchstone.html" title="nport.touchstone — Touchstone"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nport v? documentation</a> &raquo;</li>
+          <li><a href="formats.html" accesskey="U">Formats</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-nport.citi">
+<h1><tt class="xref docutils literal"><span class="pre">nport.citi</span></tt> &#8212; CITI<a class="headerlink" href="#module-nport.citi" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="nport.citi.read">
+<tt class="descclassname">nport.citi.</tt><tt class="descname">read</tt><big>(</big><em>file_path</em>, <em>verbose=False</em><big>)</big><a class="headerlink" href="#nport.citi.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the contents of a CITI file into an NPort</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">NPort holding data contained in the CITI file</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nport.citi.write">
+<tt class="descclassname">nport.citi.</tt><tt class="descname">write</tt><big>(</big><em>instance</em>, <em>file_path</em><big>)</big><a class="headerlink" href="#nport.citi.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the n-port data held in <cite>instance</cite> to a CITI file at file_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>instance</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; n-port data</li>
+<li><em>file_path</em> (str) &#8211; filename to write to (without extension)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">nport.citi</span></tt> &#8212; CITI</a><ul>
+<li><a class="reference external" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="touchstone.html"
+                                  title="previous chapter"><tt class="docutils literal"><span class="pre">nport.touchstone</span></tt> &#8212; Touchstone</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="nporttool.html"
+                                  title="next chapter"><strong>nporttool</strong> &#8212; Command line nport</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/citi.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="nporttool.html" title="nporttool — Command line nport"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="touchstone.html" title="nport.touchstone — Touchstone"
+             >previous</a> |</li>
+        <li><a href="index.html">nport v? documentation</a> &raquo;</li>
+          <li><a href="formats.html" >Formats</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+    </div>
+  </body>
+</html>

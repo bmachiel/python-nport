@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nport — n-ports and 2n-ports &mdash; nport v? documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '?',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
+    <link rel="top" title="nport v? documentation" href="index.html" />
+    <link rel="up" title="Modules" href="modules.html" />
+    <link rel="next" title="nport.tline — Transmission lines" href="tline.html" />
+    <link rel="prev" title="Modules" href="modules.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="tline.html" title="nport.tline — Transmission lines"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nport v? documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Modules</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-nport">
+<h1><tt class="xref docutils literal"><span class="pre">nport</span></tt> &#8212; n-ports and 2n-ports<a class="headerlink" href="#module-nport" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nport.NPort">
+<em class="property">class </em><tt class="descclassname">nport.</tt><tt class="descname">NPort</tt><big>(</big><em>freqs</em>, <em>matrices</em>, <em>type</em>, <em>z0=50</em><big>)</big><a class="headerlink" href="#nport.NPort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">nport.nport.NPortBase</span></tt></p>
+<p>Class representing an n-port across a list of frequencies</p>
+<p>Initialize an instance, specifying the frequency samples, all
+corresponsing matrices, the matrix type and the reference impedance</p>
+<dl class="method">
+<dt id="nport.NPort.add">
+<tt class="descname">add</tt><big>(</big><em>freq</em>, <em>matrix</em><big>)</big><a class="headerlink" href="#nport.NPort.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an NPort with the specified frequency sample added</p>
+<p>If matrix is an NPortMatrix, its elements will be converted to this
+NPort&#8217;s type and characteristic impedance.
+If matrix is a complex array, it is assumed the elements are in the
+format of this NPort</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPort.convert">
+<tt class="descname">convert</tt><big>(</big><em>mtype</em>, <em>z0=None</em><big>)</big><a class="headerlink" href="#nport.NPort.convert" title="Permalink to this definition">¶</a></dt>
+<dd>Convert to another n-port matrix representation</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPort.invert">
+<tt class="descname">invert</tt><big>(</big><big>)</big><a class="headerlink" href="#nport.NPort.invert" title="Permalink to this definition">¶</a></dt>
+<dd>Return an NPort described by the inverse of this NPort&#8217;s matrices</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPort.ispassive">
+<tt class="descname">ispassive</tt><big>(</big><big>)</big><a class="headerlink" href="#nport.NPort.ispassive" title="Permalink to this definition">¶</a></dt>
+<dd>Check whether this NPort is passive</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.NPort.ports">
+<tt class="descname">ports</tt><a class="headerlink" href="#nport.NPort.ports" title="Permalink to this definition">¶</a></dt>
+<dd>Return the number of ports of this NPort</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPort.recombine">
+<tt class="descname">recombine</tt><big>(</big><em>portsets</em><big>)</big><a class="headerlink" href="#nport.NPort.recombine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recombine ports, reducing the number of ports of this NPort.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>portsets</em> (a list of ints and tuples) &#8211; An int specifies the number of
+a port that needs to be kept as-is. If the int is negative, the
+port&#8217;s polarity will be reversed. A tuple specifies a pair of ports
+that are to be recombined into one port. The second element of this
+tuple acts as the ground reference to the first element.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">recombine</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>will generate a four-port where:</p>
+<ul class="simple">
+<li>port 1 is original port 1 referenced to port 3</li>
+<li>port 2 is original port 2 referenced to port 4</li>
+<li>port 3 is original port 5</li>
+<li>port 4 is original port 6, but with reversed polarity</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPort.submatrix">
+<tt class="descname">submatrix</tt><big>(</big><em>ports</em><big>)</big><a class="headerlink" href="#nport.NPort.submatrix" title="Permalink to this definition">¶</a></dt>
+<dd>Keep only the parameters corresponding to the given ports,
+discarding the others.</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPort.twonport">
+<tt class="descname">twonport</tt><big>(</big><em>inports=None</em>, <em>outports=None</em><big>)</big><a class="headerlink" href="#nport.NPort.twonport" title="Permalink to this definition">¶</a></dt>
+<dd>Convert this NPort to a TwoNPort using inports as the input ports
+and outports as the output ports.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nport.NPortMatrix">
+<em class="property">class </em><tt class="descclassname">nport.</tt><tt class="descname">NPortMatrix</tt><a class="headerlink" href="#nport.NPortMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">nport.nport.NPortMatrixBase</span></tt></p>
+<p>Class representing an n-port matrix (Z, Y, S, T, G, H or ABCD)</p>
+<dl class="method">
+<dt id="nport.NPortMatrix.convert">
+<tt class="descname">convert</tt><big>(</big><em>mtype</em>, <em>z0=None</em><big>)</big><a class="headerlink" href="#nport.NPortMatrix.convert" title="Permalink to this definition">¶</a></dt>
+<dd>Convert to another n-port matrix representation</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPortMatrix.ispassive">
+<tt class="descname">ispassive</tt><big>(</big><big>)</big><a class="headerlink" href="#nport.NPortMatrix.ispassive" title="Permalink to this definition">¶</a></dt>
+<dd>Check whether this n-port matrix is passive</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.NPortMatrix.ports">
+<tt class="descname">ports</tt><a class="headerlink" href="#nport.NPortMatrix.ports" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="nport.NPortMatrix.recombine">
+<tt class="descname">recombine</tt><big>(</big><em>portsets</em><big>)</big><a class="headerlink" href="#nport.NPortMatrix.recombine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recombine ports, reducing the number of ports of this NPortMatrix.
+This NPortMatrix has to be an impedance matrix.</p>
+<p><cite>portsets</cite> is a list of ints and tuples. An int specifies the number of
+a port that needs to be kept as-is. If the int is negative, the port&#8217;s
+polarity will be reversed. A tuple specifies a pair of ports that are
+to be recombined into one port. The second element of this tuple acts
+as the ground reference to the first element.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">recombine</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>will generate a four-port where:</p>
+<ul class="simple">
+<li>port 1 is original port 1 referenced to port 3</li>
+<li>port 2 is original port 2 referenced to port 4</li>
+<li>port 3 is original port 5</li>
+<li>port 4 is original port 6, but with reversed polarity</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPortMatrix.submatrix">
+<tt class="descname">submatrix</tt><big>(</big><em>ports</em><big>)</big><a class="headerlink" href="#nport.NPortMatrix.submatrix" title="Permalink to this definition">¶</a></dt>
+<dd>Keep only the parameters corresponding to the given ports,
+discarding the others.</dd></dl>
+
+<dl class="method">
+<dt id="nport.NPortMatrix.twonportmatrix">
+<tt class="descname">twonportmatrix</tt><big>(</big><em>inports=None</em>, <em>outports=None</em><big>)</big><a class="headerlink" href="#nport.NPortMatrix.twonportmatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the 2n-port matrix represented by this n-port matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>inports</em> (tuple or list) &#8211; the list of ports that make up the inputs of the 2n-port</li>
+<li><em>outports</em> (tuple or list) &#8211; the list of ports that make up the outputs</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a title="nport.TwoNPortMatrix" class="reference internal" href="#nport.TwoNPortMatrix"><tt class="xref docutils literal"><span class="pre">TwoNPortMatrix</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nport.TwoNPort">
+<em class="property">class </em><tt class="descclassname">nport.</tt><tt class="descname">TwoNPort</tt><big>(</big><em>freqs</em>, <em>matrices</em>, <em>type</em>, <em>z0=50</em><big>)</big><a class="headerlink" href="#nport.TwoNPort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">nport.nport.NPortBase</span></tt></p>
+<p>Class representing a 2n-port across a list of frequencies</p>
+<p>Initialize an instance, specifying the frequency samples, all
+corresponsing matrices, the matrix type and the reference impedance</p>
+<dl class="method">
+<dt id="nport.TwoNPort.add">
+<tt class="descname">add</tt><big>(</big><em>freq</em>, <em>matrix</em><big>)</big><a class="headerlink" href="#nport.TwoNPort.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a TwoNPort with the specified frequency sample added</p>
+<p>If matrix is a TwoNPortMatrix, its elements will be converted to this
+TwoNPort&#8217;s type and characteristic impedance.
+If matrix is a complex array, it is assumed the elements are in the
+format of this TwoNPort</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nport.TwoNPort.convert">
+<tt class="descname">convert</tt><big>(</big><em>type</em>, <em>z0=None</em><big>)</big><a class="headerlink" href="#nport.TwoNPort.convert" title="Permalink to this definition">¶</a></dt>
+<dd>Convert to another 2n-port matrix representation</dd></dl>
+
+<dl class="method">
+<dt id="nport.TwoNPort.nport">
+<tt class="descname">nport</tt><big>(</big><big>)</big><a class="headerlink" href="#nport.TwoNPort.nport" title="Permalink to this definition">¶</a></dt>
+<dd>Convert this TwoNPort to an NPort</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.TwoNPort.ports">
+<tt class="descname">ports</tt><a class="headerlink" href="#nport.TwoNPort.ports" title="Permalink to this definition">¶</a></dt>
+<dd>Return the number of ports of this TwoNPort</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="nport.TwoNPortMatrix">
+<em class="property">class </em><tt class="descclassname">nport.</tt><tt class="descname">TwoNPortMatrix</tt><a class="headerlink" href="#nport.TwoNPortMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">nport.nport.NPortMatrixBase</span></tt></p>
+<p>Class representing a 2n-port matrix (Z, Y, S, T, G, H or ABCD)</p>
+<dl class="method">
+<dt id="nport.TwoNPortMatrix.convert">
+<tt class="descname">convert</tt><big>(</big><em>mtype</em>, <em>z0=None</em><big>)</big><a class="headerlink" href="#nport.TwoNPortMatrix.convert" title="Permalink to this definition">¶</a></dt>
+<dd>Convert from one 2n-port matrix representation to another</dd></dl>
+
+<dl class="method">
+<dt id="nport.TwoNPortMatrix.nportmatrix">
+<tt class="descname">nportmatrix</tt><big>(</big><big>)</big><a class="headerlink" href="#nport.TwoNPortMatrix.nportmatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="nport.TwoNPortMatrix.ports">
+<tt class="descname">ports</tt><a class="headerlink" href="#nport.TwoNPortMatrix.ports" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">nport</span></tt> &#8212; n-ports and 2n-ports</a><ul>
+<li><a class="reference external" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="modules.html"
+                                  title="previous chapter">Modules</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="tline.html"
+                                  title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/nport.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tline.html" title="nport.tline — Transmission lines"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             >previous</a> |</li>
+        <li><a href="index.html">nport v? documentation</a> &raquo;</li>
+          <li><a href="modules.html" >Modules</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+    </div>
+  </body>
+</html>

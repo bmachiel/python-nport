@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>nport.tline — Transmission lines &mdash; nport v? documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '?',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
+    <link rel="top" title="nport v? documentation" href="index.html" />
+    <link rel="up" title="Modules" href="modules.html" />
+    <link rel="next" title="nport.deemb — De-embedding tools" href="deemb.html" />
+    <link rel="prev" title="nport — n-ports and 2n-ports" href="nport.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="deemb.html" title="nport.deemb — De-embedding tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nport.html" title="nport — n-ports and 2n-ports"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nport v? documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Modules</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-nport.tline">
+<h1><tt class="xref docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines<a class="headerlink" href="#module-nport.tline" title="Permalink to this headline">¶</a></h1>
+<p>For now, only two-conductor transmission lines are supported.</p>
+<div class="section" id="two-conductor-transmission-lines">
+<h2>Two-conductor transmission lines<a class="headerlink" href="#two-conductor-transmission-lines" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="nport.tline.TransmissionLine">
+<em class="property">class </em><tt class="descclassname">nport.tline.</tt><tt class="descname">TransmissionLine</tt><big>(</big><em>twonport</em>, <em>length</em><big>)</big><a class="headerlink" href="#nport.tline.TransmissionLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class representing a two-conductor transmission line. It takes the
+2-port parameters of a transmission line and its length, and it calculates
+the transmission lines&#8217;:</p>
+<ul class="simple">
+<li>propagation constant <a title="nport.tline.TransmissionLine.gamma" class="reference internal" href="#nport.tline.TransmissionLine.gamma"><tt class="xref docutils literal"><span class="pre">gamma</span></tt></a>,</li>
+<li>characteristic impedance <a title="nport.tline.TransmissionLine.z0" class="reference internal" href="#nport.tline.TransmissionLine.z0"><tt class="xref docutils literal"><span class="pre">z0</span></tt></a>, and</li>
+<li>per-unit-length parameters (<a title="nport.tline.TransmissionLine.rpm" class="reference internal" href="#nport.tline.TransmissionLine.rpm"><tt class="xref docutils literal"><span class="pre">rpm</span></tt></a>, <a title="nport.tline.TransmissionLine.lpm" class="reference internal" href="#nport.tline.TransmissionLine.lpm"><tt class="xref docutils literal"><span class="pre">lpm</span></tt></a>, <a title="nport.tline.TransmissionLine.gpm" class="reference internal" href="#nport.tline.TransmissionLine.gpm"><tt class="xref docutils literal"><span class="pre">gpm</span></tt></a>, <a title="nport.tline.TransmissionLine.cpm" class="reference internal" href="#nport.tline.TransmissionLine.cpm"><tt class="xref docutils literal"><span class="pre">cpm</span></tt></a>)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>twonport</em> (TwoNPort) &#8211; 2-port that represents a transmission line</li>
+<li><em>length</em> (float) &#8211; physical length of the transmission line in meters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="nport.tline.TransmissionLine.gamma">
+<tt class="descname">gamma</tt><a class="headerlink" href="#nport.tline.TransmissionLine.gamma" title="Permalink to this definition">¶</a></dt>
+<dd>Propagation constant</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.tline.TransmissionLine.z0">
+<tt class="descname">z0</tt><a class="headerlink" href="#nport.tline.TransmissionLine.z0" title="Permalink to this definition">¶</a></dt>
+<dd>Characteristic impedance</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.tline.TransmissionLine.rpm">
+<tt class="descname">rpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.rpm" title="Permalink to this definition">¶</a></dt>
+<dd>Resistance per meter</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.tline.TransmissionLine.lpm">
+<tt class="descname">lpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.lpm" title="Permalink to this definition">¶</a></dt>
+<dd>Inductance per meter</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.tline.TransmissionLine.gpm">
+<tt class="descname">gpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.gpm" title="Permalink to this definition">¶</a></dt>
+<dd>Conductance per meter</dd></dl>
+
+<dl class="attribute">
+<dt id="nport.tline.TransmissionLine.cpm">
+<tt class="descname">cpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.cpm" title="Permalink to this definition">¶</a></dt>
+<dd>Capacitance per meter</dd></dl>
+
+</dd></dl>
+
+<p>The RLGC parameters are calculated from the propagation constant and
+characteristic impedance as detailed in <a class="reference internal" href="#eis92">[EIS92]</a>.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils citation" frame="void" id="eis92" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[EIS92]</a></td><td>&#8220;S-Parameter-Based IC Interconnect Transmission Line
+Characterization&#8221;
+by William R. Eisenstadt and Yungseon Eo
+in <em>IEEE Transactions on Components, Hybrids, and Manufacturing
+Technology</em>,
+vol. 15, no. 4, pp.483-490, 1992</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines</a><ul>
+<li><a class="reference external" href="#two-conductor-transmission-lines">Two-conductor transmission lines</a></li>
+<li><a class="reference external" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="nport.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">nport</span></tt> &#8212; n-ports and 2n-ports</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="deemb.html"
+                                  title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">nport.deemb</span></tt> &#8212; De-embedding tools</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/tline.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="deemb.html" title="nport.deemb — De-embedding tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nport.html" title="nport — n-ports and 2n-ports"
+             >previous</a> |</li>
+        <li><a href="index.html">nport v? documentation</a> &raquo;</li>
+          <li><a href="modules.html" >Modules</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+    </div>
+  </body>
+</html>
