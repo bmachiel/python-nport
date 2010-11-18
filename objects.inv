@@ -1,6 +1,6 @@
 # Sphinx inventory version 1
 # Project: nport
-# Version: ?
+# Version: 0.1
 nport.citi mod citi.html
 nport mod nport.html
 nport.touchstone mod touchstone.html
