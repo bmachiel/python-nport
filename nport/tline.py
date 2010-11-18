@@ -3,6 +3,7 @@ from __future__ import division
 import numpy as np
 from .base import TRANSMISSION
 from twonport import TwoNPort
+from eigenshuffle import eigenshuffle
 
 
 
@@ -222,6 +223,266 @@ class RLGCTransmissionLine(TransmissionLine):
     @cached_property
     def z0_backward(self):
         return unwrap_sqrt(self.z_backward / self.y_backward)
+
+
+class MulticonductorTransmissionLine(object):
+    """Class representing a multiconductor transmission line. It calculates:
+    
+    * per-unit-length matrices (R, L, G, C), 
+    * modal propagation constant matrices and characteristic impedance matrices,
+      and
+    * natural propagation constant matrices and characteristic impedance
+      matrices
+
+    For non-uniform lines, the characteristic impedance matrices differ for forward 
+    and backward propagation:
+    
+    * :attr:`modal_z0_forward` and :attr:`natural_z0_forward`
+    * :attr:`modal_z0_backward` and :attr:`natural_z0_backward`
+
+    For reciprocal lines, the propagation constant matrices are the same for forward
+    and backward propagation, while for non-reciprocal lines they differ.
+
+    """
+    def __init__(self, twonport, length, reciprocal=False):
+        """
+        :param twonport: 2n-port that represents a multiconductor transmission
+                         line
+        :type twonport: TwoNPort
+        :param length: physical length of the transmission line in meters
+        :type length: float
+        :param reciprocal: True if `twonport` represents a reciprocal line
+        :type reciprocal: bool
+        
+        """
+        self.twonport = twonport.convert(nport.TRANSMISSION)
+        self.freqs = self.twonport.freqs
+        self.length = length
+        
+        # modal analysis of an MTL
+        # reference:
+        # [FAR04] "A new generalized modal analysis theory for nonuniform
+        #   multiconductor transmission lines" by J.A. Brandao Faria
+        # other references:
+        # [FAR93] "Multiconductor Transmission-Line Structures - Modal Analysis
+        #   Techniques" by J.A. Brandao Faria
+        # [PAU08] "Analysis of Multiconductor Transmission Lines", 2nd edition
+        #   by Clayton R. Paul
+        
+        # retrieve ABCD parameters
+        self.a = self.twonport.get_parameter(1, 1)
+        self.b = self.twonport.get_parameter(1, 2)
+        self.c = self.twonport.get_parameter(2, 1)
+        self.d = self.twonport.get_parameter(2, 2)
+        
+        #print "AD-CD =", np.dot(self.a[-1], self.d[-1].T) - np.dot(self.b[-1], self.c[-1].T)
+
+        # (INCORRECT) calculate per-unit-length RLGC [EIS92]
+        #~ tmp = (self.a + self.d) / 2.0
+        #~ #expgaml = tmp + np.sqrt( (tmp)**2 - 1 ) # MATLAB definition for arccosh
+        #~ #self.gamma_ = np.log(expgaml) / self.length
+        #~ self.gamma_ = np.arccosh(tmp) / self.length
+        #~ self.z0_ = np.sqrt(self.b / self.c)
+        
+        #~ self.rpm = (self.gamma_ * self.z0_).real
+        #~ self.lpm = (((self.gamma_ * self.z0_).imag).T / (2 * np.pi * self.freqs)).T
+        #~ self.gpm = (self.gamma_ / self.z0_).real
+        #~ self.cpm = (((self.gamma_ / self.z0_).imag).T / (2 * np.pi * self.freqs)).T
+
+        # calculate eigenvalues and eigenvectors
+        if reciprocal:
+            self.b_dot_ct = np.array([np.dot(b, c.T)
+                                      for b, c in zip(self.b, self.c)])
+            self.bt_dot_c = np.array([np.dot(b.T, c)
+                                      for b, c in zip(self.b, self.c)])
+
+            self.e0, self.t0 = eigenshuffle(self.b_dot_ct)
+            self.el, self.tl = eigenshuffle(self.bt_dot_c)
+        else:
+            # [FAR04] assumes reciprocal lines, so we need to use more complex equations
+            inv = True
+            if not inv:
+                # these result in the inverse eigenvalues of the method for
+                # reciprocal lines and ai_dot_b and d_dot_bi below
+                # TODO: understand why and explain
+                a_dot_ci = np.array([np.dot(a, np.linalg.inv(c))
+                                     for a, c in zip(self.a, self.c)])
+                d_dot_bi = np.array([np.dot(d, np.linalg.inv(b))
+                                     for d, b in zip(self.d, self.b)])
+                t0_prod = np.array([np.dot(aci, dbi)
+                                    for aci, dbi in zip(a_dot_ci, d_dot_bi)])
+                w0_prod = np.array([np.dot(dbi, aci)
+                                    for dbi, aci in zip(d_dot_bi, a_dot_ci)])
+                # hence we need to invert the eigenvalues ...
+                t0_prod = np.array([np.linalg.inv(t0p) for t0p in t0_prod])
+                w0_prod = np.array([np.linalg.inv(w0p) for w0p in w0_prod])
+            else:
+                # ... or calculate the eigenvalues from the inverse matrix
+                c_dot_ai = np.array([np.dot(c, np.linalg.inv(a))
+                                     for a, c in zip(self.a, self.c)])
+                b_dot_di = np.array([np.dot(b, np.linalg.inv(d))
+                                     for b, d in zip(self.b, self.d)])
+                t0_prod = np.array([np.dot(bdi, cai)
+                                    for cai, bdi in zip(c_dot_ai, b_dot_di)])
+                w0_prod = np.array([np.dot(cai, bdi)
+                                    for cai, bdi in zip(c_dot_ai, b_dot_di)])
+
+            ai_dot_b = np.array([np.dot(np.linalg.inv(a), b)
+                                 for a, b in zip(self.a, self.b)])
+            di_dot_c = np.array([np.dot(np.linalg.inv(d), c)
+                                 for d, c in zip(self.d, self.c)])
+            tl_prod = np.array([np.dot(aib, dic)
+                                for aib, dic in zip(ai_dot_b, di_dot_c)])
+            wl_prod = np.array([np.dot(dic, aib)
+                                for dic, aib in zip(di_dot_c, ai_dot_b)])
+
+            self.e0, self.t0 = eigenshuffle(t0_prod)
+            self.el, self.tl = eigenshuffle(tl_prod)
+            self.ew0, self.w0 = eigenshuffle(w0_prod)
+            self.ewl, self.wl = eigenshuffle(wl_prod)
+
+        self.t0inv = np.array([np.linalg.inv(t0) for t0 in self.t0])
+        self.tlinv = np.array([np.linalg.inv(tl) for tl in self.tl])
+
+        if reciprocal:
+            self.w0 = np.array([np.transpose(t0inv) for t0inv in self.t0inv])
+            self.wl = np.array([np.transpose(tlinv) for tlinv in self.tlinv])
+
+        self.w0inv = np.array([np.linalg.inv(w0) for w0 in self.w0])
+        #self.wlinv = np.array([np.linalg.inv(wl) for wl in self.wl])
+
+        self.am = np.array([np.dot(np.dot(t0inv, a), tl)
+                            for t0inv, a, tl
+                            in zip(self.t0inv, self.a, self.tl)])
+        self.bm = np.array([np.dot(np.dot(t0inv, b), wl)
+                            for t0inv, b, wl
+                            in zip(self.t0inv, self.b, self.wl)])
+        self.cm = np.array([np.dot(np.dot(w0inv, c), tl)
+                            for w0inv, c, tl
+                            in zip(self.w0inv, self.c, self.tl)])
+        self.dm = np.array([np.dot(np.dot(w0inv, d), wl)
+                            for w0inv, d, wl
+                            in zip(self.w0inv, self.d, self.wl)])
+        
+        # calculate modal propagation factors and characteristic impedances
+        diag_am = np.asarray([np.diag(am) for am in self.am])
+        diag_bm = np.asarray([np.diag(bm) for bm in self.bm])
+        diag_cm = np.asarray([np.diag(cm) for cm in self.cm])
+        diag_dm = np.asarray([np.diag(dm) for dm in self.dm])
+        
+        if reciprocal:
+            tmp = (diag_am + diag_dm) / 2.0
+            expgaml = tmp + np.sqrt( (tmp)**2 - 1 )
+            expminusgaml = tmp - np.sqrt( (tmp)**2 - 1 )
+                # this uses the MATLAB definition for arccosh
+            #self.modal_z0 = np.sqrt(diag_bm / diag_cm)
+            self.modal_gamma_forward = np.log(expgaml) / self.length
+            self.modal_gamma_backward = self.modal_gamma_forward
+            self.modal_z0_forward = diag_bm / (expgaml - diag_am)
+            self.modal_z0_backward = diag_bm / (diag_am - expminusgaml)
+            # TODO detect uniform MTLs
+            #   based on T0, Tl, W0, Wl ?
+            #   np.max(self.modal_z0_forward - self.modal_z0_backward)
+        else:
+            tmp = - np.sqrt( (diag_dm - diag_am)**2 + 4 * diag_bm *diag_cm )
+            expgaml = 2 * (diag_am * diag_dm - diag_bm * diag_cm) / (diag_dm + diag_am + tmp)
+            expgaml_backward = 2 * (diag_am * diag_dm - diag_bm * diag_cm) / (diag_dm + diag_am - tmp)
+            self.modal_gamma_forward = np.log(expgaml) / self.length
+            self.modal_gamma_backward = np.log(expgaml_backward) / self.length
+            self.modal_z0_forward = 2 * diag_bm / (diag_dm - diag_am - tmp)
+            self.modal_z0_backward = - 2 * diag_bm / (diag_dm - diag_am + tmp)
+
+        self.modal_y0_forward = 1.0 / self.modal_z0_forward
+        self.modal_y0_backward = 1.0 / self.modal_z0_backward
+        
+        # TODO: unwrap gamma
+
+        # calculate (natural) longitudinal RLGC matrices
+        # NOTE: verify!
+        #   z0_forward and z0_backward?
+        #   t0, tl, w0, wl?
+        # 1) compute gamma and Z0 matrices in natural coordinates [FAR93] eq 1.59, [PAU08] eq 7.77 (?)
+        self.natural_gamma_forward = \
+            np.asarray([np.dot(np.dot(t0, np.diag(gam)), tlinv)
+                        for t0, gam, tlinv
+                        in zip(self.t0, self.modal_gamma_forward, self.tlinv)])
+        #~ self.natural_gamma_backward = \  # this is a guess
+            #~ np.asarray([np.dot(np.dot(tl, np.diag(gam)), t0inv)
+                #~ for tl, gam, t0inv in zip(self.tl, self.modal_gamma, self.t0inv)])
+
+        self.modal_y0m_forward = np.asarray([np.diag(y0)
+                                             for y0
+                                             in self.modal_y0_forward])
+        self.modal_y0m_backward = np.asarray([np.diag(y0)
+                                              for y0
+                                              in self.modal_y0_backward])
+            # the modal wave admittance matrix (diagonal)
+
+        self.natural_y0_forward = np.asarray([np.dot(np.dot(w0, y0), tlinv)
+                                              for w0, y0, tlinv
+                                              in zip(self.w0,
+                                                     self.modal_y0m_forward,
+                                                     self.tlinv)])
+        #~ self.natural_y0_backward = np.asarray([np.dot(np.dot(wl, y0), t0inv) # this is a guess
+            #~ for wl, y0, t0inv in zip(self.wl, self.modal_y0m_backward, self.t0inv)])
+            # conversion to natural wave admittance matrices [FAR93] eq 1.57
+        self.natural_z0_forward = np.asarray([np.linalg.inv(y0) 
+                                              for y0
+                                              in self.natural_y0_forward])
+            # natural wave impedance matrices
+
+        # 2) calculate per-unit-length Z, Y and RLGC matrices [FAR93] eq 1.58 & 1.60
+        self.zpm_forward = np.asarray([np.dot(gam, zw)
+                                       for gam, zw
+                                       in zip(self.natural_gamma_forward,
+                                              self.natural_z0_forward)])
+        self.ypm_forward = np.asarray([np.dot(yw, gam)
+                                       for yw, gam
+                                       in zip(self.natural_y0_forward,
+                                              self.natural_gamma_forward)])
+        
+        self._rpm_forward = self.zpm_forward.real
+        self._lpm_forward = (self.zpm_forward.imag.T /
+                             (2 * np.pi * self.freqs)).T
+        self._gpm_forward = self.ypm_forward.real
+        self._cpm_forward = (self.ypm_forward.imag.T /
+                             (2 * np.pi * self.freqs)).T
+
+        # gamma's should have positive betas (not done above so as not to ruin RLGC calculation)
+        self.modal_gamma_forward *= np.sign(self.modal_gamma_forward.imag)
+        self.modal_gamma_backward *= np.sign(self.modal_gamma_backward.imag)
+
+        self.modal_gamma = self.modal_gamma_forward
+
+    @property
+    def gamma_forward(self):
+        """Forward propagation constant"""
+        return self._gamma_forward
+
+    @property
+    def z0_forward(self):
+        """Forward characteristic impedance"""
+        return self._z0_forward
+
+    @property
+    def rpm_forward(self):
+        """Resistance per meter for forward traveling waves"""
+        return self._rpm_forward
+
+    @property
+    def lpm_forward(self):
+        """Inductance per meter for forward traveling waves"""
+        return self._lpm_forward
+
+    @property
+    def gpm_forward(self):
+        """Conductance per meter for forward traveling waves"""
+        return self._gpm_forward
+
+    @property
+    def cpm_forward(self):
+        """Capacitance per meter for forward traveling waves"""
+        return self._cpm_forward
 
 
 def unwrap_sqrt(arg):
