@@ -42,7 +42,7 @@ project = u'nport'
 copyright = u'2010, Brecht Machiels'
 
 try:
-    for line in open('../nport/__version__.py').readlines():
+    for line in open('../nport/version.py').readlines():
         if (line.startswith('__version__')):
             exec(line.strip())
 except:
