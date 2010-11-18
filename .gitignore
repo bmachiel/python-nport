@@ -1,0 +1,7 @@
+build
+dist
+nport.egg-info
+nport/version.py
+doc/_build
+*.pyc
+*.~
