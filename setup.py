@@ -27,11 +27,12 @@ setup(
     version=version,
     packages=['nport'],
     scripts=['nporttool'],
+    requires=['numpy','scipy'],
     
-    author = "Brecht Machiels",
-    author_email = "brecht.machiels@esat.kuleuven.be",
-    description = "Python package for handling n-port data",
-    license = "GPL",
-    keywords = "two-port 2n-port s-parameters touchstone citi deembedding",
-    url = "https://github.com/bmachiel/python-nport",
+    author="Brecht Machiels",
+    author_email="brecht.machiels@esat.kuleuven.be",
+    description="Python package for handling n-port data",
+    license="GPL",
+    keywords="two-port 2n-port s-parameters touchstone citi deembedding",
+    url="https://github.com/bmachiel/python-nport",
 )
