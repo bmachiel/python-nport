@@ -12,7 +12,8 @@ class TransmissionLine(object):
 
     * propagation constant :attr:`gamma`, 
     * characteristic impedance :attr:`z0`, and
-    * per-unit-length parameters (:attr:`rpm`, :attr:`lpm`, :attr:`gpm`, :attr:`cpm`)
+    * per-unit-length parameters (:attr:`rpm`, :attr:`lpm`, :attr:`gpm`,
+                                  :attr:`cpm`)
 
     """
     def __init__(self, twonport, length):

@@ -30,28 +30,32 @@ ABCD = TRANSMISSION = TYPE_ABCD = 'ABCD'
 class NPortMatrixBase(np.ndarray):
     """Base class representing an n-port matrix (Z, Y, S, T, G, H or ABCD)"""
     # TODO: implement type checking for operations (as in NPortBase)
-    def __new__(cls, matrix, mtype, z0=None):
+    def __new__(cls, matrix, type, z0=None):
         # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
         obj = np.asarray(matrix, dtype=complex).view(cls)
-        if mtype not in (Z, Y, S, T, H, G, ABCD):
+        if type not in (Z, Y, S, T, H, G, ABCD):
             raise ValueError("illegal matrix type specified")
-        obj.type = mtype
-        obj.z0 = NPortMatrixBase.__z0test__(mtype, z0)
+        obj.type = type
+        obj.z0 = obj._z0test(type, z0)
         return obj
 
-    @classmethod
-    def __z0test__(cls, mtype, z0):
-        if mtype in (S, T):
-            if z0 is not None:
-                return z0
-            else:
-                return 50.0
-        else:
-            if z0 is not None:
-                raise ValueError("the specified n-port representation (%s) does"
-                                 " not require a reference impedance" % mtype)
-            else:
-                return None
+    def _z0test(self, type, z0):
+        """Verify if a normalizing impedance may be specified for the given
+        n-port parameter type
+        
+        :param type: n-port parameter type
+        :type type: Z, Y, S, ABCD or T
+        :param z0: normalizing impedance (for S or T)
+        :type z0: float
+        
+        """
+        if type in (S, T):
+            if z0 is None:
+                z0 = 50.0
+        elif z0 is not None:
+            raise ValueError("the specified n-port representation (%s) does "
+                             "not require a reference impedance" % type)
+        return z0
 
     def __array_finalize__(self, obj):
         if obj is None: return
@@ -61,6 +65,28 @@ class NPortMatrixBase(np.ndarray):
     @property
     def ports(self):
         raise NotImplementedError
+    
+    def convert_z0test(self, type, z0):
+        """Check supplied `z0` for conversion and set default value depending on
+        the type
+        
+        :param type: target type for conversion
+        :type type: Z, Y, S, T or ABCD
+        :param z0: target normalization impedance (for S and T types)
+        :type z0: float
+        :returns: `z0` or default value when `z0 == None`
+        :rtype: float
+        """
+        if type in (S, T):
+            if z0 is None:
+                if self.type in (S, T):
+                    z0 = self.z0
+                else:
+                    z0 = 50.0
+        elif z0 is not None:
+            raise ValueError("the specified n-port representation (%s) does"
+                             " not require a reference impedance" % type)
+        return z0
 
 
 class NPortBase(NPortMatrixBase):
@@ -104,13 +130,13 @@ class NPortBase(NPortMatrixBase):
                 setattr(P, name, make_op(name, func))
         return P
 
-    def __new__(cls, freqs, matrices, mtype, z0=None):
+    def __new__(cls, freqs, matrices, type, z0=None):
         if len(freqs) != len(matrices):
             raise ValueError("the list of frequencies and the list of "
                              "matrices should have equal lenghts")
         if matrices[0].shape[0] != matrices[0].shape[1]:
             raise ValueError("the matrices should be square")
-        obj = NPortMatrixBase.__new__(cls, matrices, mtype, z0)
+        obj = NPortMatrixBase.__new__(cls, matrices, type, z0)
         obj.freqs = np.asarray(freqs)
         return obj
 
@@ -132,15 +158,15 @@ class NPortBase(NPortMatrixBase):
         #~ return self.__repr__()
 
     def get_parameter(self, port1, port2):
-        """Return the parameter as specified by the indices port1 and port2 as
-        an ndarray
+        """Return the parameter as specified by the indices `port1` and `port2`
+        as an ndarray
         
         """
         return np.asarray(self[:, port1 - 1, port2 - 1])
 
     def get_element(self, port1, port2):
         """Return the submatrices made up of the element as specified by the
-        indices port1 and port2
+        indices `port1` and `port2`
         
         """
         subclass = type(self)
@@ -150,8 +176,8 @@ class NPortBase(NPortMatrixBase):
 
     def at(self, freqs):
         """Return the interpolated n-port data at the given
-        * list of frequencies (freqs is iterable), or
-        * at a single frequency (freqs is a value)
+        * list of frequencies (`freqs` is iterable), or
+        * at a single frequency (`freqs` is a value)
         
         """
         # check whether freqs is iterable
@@ -171,7 +197,7 @@ class NPortBase(NPortMatrixBase):
             return interpolated_nport
             
     def average(self, n):
-        """Take a moving average over n frequency samples"""
+        """Take a moving average over `n` frequency samples"""
         averaged = np.zeros_like(np.asarray(self))
         for i in range(len(self)):
             for j in range(- int(np.floor(n/2)), int(np.ceil(n/2))):
@@ -195,8 +221,8 @@ class NPortBase(NPortMatrixBase):
 
 class NPortMatrix(NPortMatrixBase):
     """Class representing an n-port matrix (Z, Y, S, T, G, H or ABCD)"""
-    def __new__(cls, matrix, mtype, z0=None):
-        obj = NPortMatrixBase.__new__(cls, matrix, mtype, z0)
+    def __new__(cls, matrix, type, z0=None):
+        obj = NPortMatrixBase.__new__(cls, matrix, type, z0)
         if len(obj.shape) != 2:
             raise ValueError("the matrix should be two-dimensional")
         if obj.shape[0] != obj.shape[1]:
@@ -205,6 +231,7 @@ class NPortMatrix(NPortMatrixBase):
 
     @property
     def ports(self):
+        """The number of ports in this NPortMatrix"""
         return self.shape[0]
 
     def twonportmatrix(self, inports=None, outports=None):
@@ -223,7 +250,7 @@ class NPortMatrix(NPortMatrixBase):
         n = int(self.ports / 2)
         if inports is None and outports is None:
             inports = range(n)
-            outports = [i + n for i in range(n)]
+            outports = range(n, 2*n)
             matrix = self
         else:
             # check whether the given sets of ports are valid
@@ -256,7 +283,23 @@ class NPortMatrix(NPortMatrixBase):
         matrix = np.array([[x11, x12], [x21, x22]])
         return twonport.TwoNPortMatrix(matrix, self.type, self.z0)
 
-    def convert(self, mtype, z0=None):
+    def renormalize(self, z0):
+        """Renormalize the n-port parameters to `z0`"""
+        # http://qucs.sourceforge.net/tech/node98.html
+        # "Renormalization of S-parameters to different port impedances"
+        assert self.type == S
+        if z0 == self.z0:
+            result = self
+        else:
+            idty = np.identity(len(self), dtype=complex)
+
+            r = (z0 - self.z0) / (z0 + self.z0)
+            result = self.__class__(np.dot(self - idty * r,
+                                           np.linalg.inv(idty - r * self)),
+                                    self.type, z0)
+        return result
+
+    def convert(self, type, z0=None):
         """Convert to another n-port matrix representation"""
         # references:
         #  * http://qucs.sourceforge.net/tech/node98.html
@@ -266,97 +309,52 @@ class NPortMatrix(NPortMatrixBase):
         #  * Agilent AN 154 - S-Parameter Design (S <-> T)
         #  * MATLAB S-parameter toolbox (Z, Y, H, G, ABCD, T)
         #           http://www.mathworks.com/matlabcentral/fileexchange/6080
-        z0 = NPortMatrixBase.__z0test__(mtype, z0)
-        identity = np.identity(len(self), dtype=complex)
+        z0 = self.convert_z0test(type, z0)
+        idty = np.identity(len(self), dtype=complex)
+        invert = np.linalg.inv
+
+        if type in (ABCD, T):
+            raise TypeError("Cannot convert an NPort to %s-parameter "
+                            "representation. Convert to a TwoNPort first" %
+                            type)
+        elif type not in (Z, Y, S):
+            raise TypeError("Unknown n-port parameter type.")
 
         # TODO: check for singularities
         if self.type == SCATTERING:
-            if mtype == IMPEDANCE:
-                result = self.z0 * (2 * np.linalg.inv(identity - self) -
-                                    identity)
-            elif mtype == ADMITTANCE:
-                # TODO: need to verify
-                result = 1 / self.z0 * np.dot(np.linalg.inv(identity + self),
-                                              identity - self)
-            #~ elif mtype == SCATTERING_TRANSFER:
-                #~ # only 2-port
-                #~ # NOTE: S21 is NOT used - verify!
-                #~ assert self.ports == 2
-                #~ T11 = 1 / self[0,1]
-                #~ T12 = - self[1,1] / self[0,1]
-                #~ T21 = self[0,0] / self[0,1]
-                #~ T22 = self[0,1] - self[0,0] * self[1,1] / self[0,1]
-                #~ result = np.array([[T11, T12], [T21, T22]])
-            #~ elif mtype == TRANSMISSION:
-                #~ # TODO: only provide in TwoNPortMatrix?
-                #~ # only 2-port
-                #~ assert self.ports == 2
-                #~ denom = 2 * self[1,0]
-                #~ A =               ((1 + self[0,0])*(1 - self[1,1]) + self[0,1] * self[1,0]) / denom
-                #~ B =     self.z0 * ((1 + self[0,0])*(1 + self[1,1]) - self[0,1] * self[1,0]) / denom
-                #~ C = 1.0/self.z0 * ((1 - self[0,0])*(1 - self[1,1]) - self[0,1] * self[1,0]) / denom
-                #~ D =               ((1 - self[0,0])*(1 + self[1,1]) + self[0,1] * self[1,0]) / denom
-                #~ result = np.array([[A, B], [C, D]])
-            elif mtype == SCATTERING:
+            if type == IMPEDANCE:
+                result = self.z0 * (2 * invert(idty - self) - idty)
+            elif type == ADMITTANCE:
+                result = 1 / self.z0 * np.dot(invert(idty + self), idty - self)
+            elif type == SCATTERING:
                 if z0 == self.z0:
-                    return self
+                    result = self
                 else:
-                    # TODO: renormalize
-                    raise NotImplementedError
-            else:
-                raise NotImplementedError
+                    return self.renormalize(z0)
         elif self.type == IMPEDANCE:
-            if mtype == SCATTERING:
-                # TODO: renormalize
-                result = identity - 2 * np.linalg.inv(identity + self / z0)
-            elif mtype == ADMITTANCE:
-                result = np.linalg.inv(self)
-            elif mtype == IMPEDANCE:
-                raise NotImplementedError
-                result = self # renormalize
-                z0 = self.z0
-            else:
-                NotImplementedError
+            if type == SCATTERING:
+                result = idty - 2 * invert(idty + self / z0)
+            elif type == ADMITTANCE:
+                result = invert(self)
+            elif type == IMPEDANCE:
+                result = self
         elif self.type == ADMITTANCE:
-            if mtype == SCATTERING:
-                # TODO: need to verify
-                result = np.dot(identity - (z0 * self), 
-                                np.linalg.inv(identity + (z0 * self)))
-            elif mtype == IMPEDANCE:
-                result = np.linalg.inv(self)
-            elif mtype == ADMITTANCE:
-                raise NotImplementedError
-                result = self # renormalize
-                z0 = self.z0
-            else:
-                raise NotImplementedError
-        #~ elif self.type == TRANSMISSION:
-            #~ if mtype == SCATTERING:
-                #~ # TODO: need to verify
-                #~ assert self.ports == 2
-                #~ A = self[0,0]
-                #~ B = self[0,1]
-                #~ C = self[1,0]
-                #~ D = self[1,1]
-                #~ B0 = B / self.z0
-                #~ C0 = C * self.z0
-                #~ denom = A + B0 + C0 + D
-                #~ S11 = (A + B0 - C0 - D) / denom
-                #~ S12 = 2 * (A * D - B * C) / denom
-                #~ S21 = 2 / denom
-                #~ S22 = (-A + B0 - C0 + D) / denom
-                #~ result = np.array([[S11, S12], [S21, S22]])
-            #~ else:
-                #~ raise NotImplementedError
-        else:
-            raise NotImplementedError
+            if type == SCATTERING:
+                result = np.dot(idty - (z0 * self), invert(idty + (z0 * self)))
+            elif type == IMPEDANCE:
+                result = invert(self)
+            elif type == ADMITTANCE:
+                result = self
 
-        return NPortMatrix(result, mtype, z0)
+        return NPortMatrix(result, type, z0)
 
     def submatrix(self, ports):
         """Keep only the parameters corresponding to the given ports,
         discarding the others.
 
+        :param ports: list of ports to keep
+        :type ports: iterable
+        
         """
         indices = [port - 1 for port in ports]
         submatrix = self[indices, :][:, indices]
@@ -416,11 +414,19 @@ class NPortMatrix(NPortMatrixBase):
             else:
                 return True
 
+    def isreciprocal(self):
+        """Check whether this n-port matrix is reciprocal"""
+        raise NotImplementedError
+
+    def issymmetrical(self):
+        """Check whether this n-port matrix is symmetrical"""
+        raise NotImplementedError
+
 
 class NPort(NPortBase):
     """Class representing an n-port across a list of frequencies"""
-    def __new__(cls, freqs, matrices, mtype, z0=None):
-        obj = NPortBase.__new__(cls, freqs, matrices, mtype, z0)
+    def __new__(cls, freqs, matrices, type, z0=None):
+        obj = NPortBase.__new__(cls, freqs, matrices, type, z0)
         if len(obj[0].shape) != 2:
             raise ValueError("the matrices should be two-dimensional")
         return obj
@@ -434,7 +440,7 @@ class NPort(NPortBase):
 
     @property
     def ports(self):
-        """Return the number of ports of this NPort"""
+        """The number of ports of this NPort"""
         return self[0].shape[0]
 
     def add(self, freq, matrix):
@@ -457,6 +463,12 @@ class NPort(NPortBase):
     def twonport(self, inports=None, outports=None):
         """Convert this NPort to a TwoNPort using inports as the input ports
         and outports as the output ports.
+        
+        :param inports: the list of ports that make up the inputs of the 2n-port
+        :type inports: tuple or list
+        :param outports: the list of ports that make up the outputs
+        :type outports: tuple or list
+        :rtype: :class:`TwoNPort`
 
         """
         twonportmatrices = []
@@ -467,17 +479,39 @@ class NPort(NPortBase):
         return twonport.TwoNPort(self.freqs, twonportmatrices, self.type,
                                  self.z0)
 
-    def convert(self, mtype, z0=None):
-        """Convert to another n-port matrix representation"""
+    def renormalize(self, z0):
+        """Renormalize the n-port parameters to `z0`"""
+        assert self.type == S
+        if z0 == self.z0:
+            result = self
+        else:
+            renormalized = []
+            for matrix in self:
+                nportmatrix = NPortMatrix(matrix, self.type, self.z0)
+                renormalized.append(nportmatrix.renormalize(z0))
+            result = self.__class__(self.freqs, renormalized, self.type, z0)
+        return result
+
+    def convert(self, type, z0=None):
+        """Convert to another n-port matrix representation
+        
+        :param type: n-port representation type to convert to
+        :type type: Z, Y or S
+        
+        """
         converted = []
         for matrix in self:
             nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            converted.append(nportmatrix.convert(mtype, z0))
-        return NPort(self.freqs, converted, mtype, z0)
+            converted.append(nportmatrix.convert(type, z0))
+        return NPort(self.freqs, converted, type, z0)
 
     def submatrix(self, ports):
         """Keep only the parameters corresponding to the given ports,
         discarding the others.
+        
+        :param ports: list of ports to keep
+        :type ports: iterable
+        
         """
         indices = [port - 1 for port in ports]
         submatrices = self[:, indices, :][:, :, indices]
@@ -495,12 +529,12 @@ class NPort(NPortBase):
     def recombine(self, portsets):
         """Recombine ports, reducing the number of ports of this NPort.
         
-        :type portsets: a list of ints and tuples
         :param portsets: An int specifies the number of
            a port that needs to be kept as-is. If the int is negative, the
            port's polarity will be reversed. A tuple specifies a pair of ports
            that are to be recombined into one port. The second element of this
            tuple acts as the ground reference to the first element.
+        :type portsets: a list of ints and tuples
         
         >>> recombine([(1,3), (2,4), 5, -6]
         
@@ -528,7 +562,7 @@ class NPort(NPortBase):
 
 
 def dot(arg1, arg2):
-    """Matrix multiplication for NPorts"""
+    """Matrix multiplication for NPorts and TwoNPorts"""
     def merge_freqs(freqs1, freqs2):
         minf = max(freqs1[0], freqs2[0])
         maxf = min(freqs1[-1], freqs2[-1])
