@@ -28,6 +28,7 @@ setup(
     packages=['nport'],
     scripts=['nporttool'],
     requires=['numpy','scipy'],
+    test_suite='nose.collector',
     
     author="Brecht Machiels",
     author_email="brecht.machiels@esat.kuleuven.be",
