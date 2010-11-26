@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Deembedder(object):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Set up the de-embedder by passing the nport parameters of the dummy
         structures.
@@ -111,8 +111,6 @@ class Vandamme01(Deembedder):
     deembed.__doc__ = Deembedder.deembed.__doc__
 
 
-kol00_asym = True
-
 class Kolding00(Deembedder):
     """
     "A Four-Step Method for De-Embedding Gigahertz On-Wafer CMOS
@@ -120,7 +118,8 @@ class Kolding00(Deembedder):
     Devices*, vol. 47, no. 4, pp. 734-740, 2000
     
     """
-    def __init__(self, simple_open, simple_short, open, short1, short2, alpha=0.0):
+    def __init__(self, simple_open, simple_short, open, short1, short2,
+                 alpha=0.0, asymmetric=False):
         """        
         :param simpleopen: simple open structure
         :type simpleopen: :class:`nport.NPort`
@@ -137,8 +136,14 @@ class Kolding00(Deembedder):
         :param alpha: compensation parameter to account for the imperfections
                       of the short standard when gaps become large
         :type alpha: float
+        :param asymmetric: use the generalized algorithm that also handles
+                           asymmetric test-fixtures (NOT VERIFIED!)
+        :type asymmetric: bool
 
         """
+        self.alpha = alpha
+        self.asymmetric = asymmetric
+        
         # convert S to Z parameters
         z_simpleopen = simple_open.convert(nport.Z)
         z_simpleshort = simple_short.convert(nport.Z)
@@ -153,7 +158,7 @@ class Kolding00(Deembedder):
         z22_so = z_simpleopen.get_element(2, 2)
 
         # pads
-        if kol00_asym:
+        if self.asymmetric:
             self.zc = 2.0/3.0 * z_simpleshort
             self.zp = (z_simpleopen - z_simpleshort)
         else:
@@ -177,12 +182,12 @@ class Kolding00(Deembedder):
         z22_o__ = z_open__.get_element(2, 2)
 
         # calculate remaining parameters
-        if kol00_asym:
+        if self.asymmetric:
             z21 = 0.5 * (z21_s1__ + z12_s1__)
             z22 = 0.5 * (z21_s2__ + z12_s2__)
             self.z2 = np.ones((2, 2)) * (z21 + z22) * 0.5
-            zi1_plus_z11 = (z11_s1__ - z21) / (1.0 + alpha)
-            zi2_plus_z12 = (z22_s2__ - z22) / (1.0 + alpha)
+            zi1_plus_z11 = (z11_s1__ - z21) / (1.0 + self.alpha)
+            zi2_plus_z12 = (z22_s2__ - z22) / (1.0 + self.alpha)
             self.zi_plus_z1 = np.asarray([[1, 0], [0, 0]]) * zi1_plus_z11 + \
                               np.asarray([[0, 0], [0, 1]]) * zi2_plus_z12
             z31 = z21_o__ + z11_o__ - 2.0 * z21 - zi1_plus_z11
@@ -197,7 +202,7 @@ class Kolding00(Deembedder):
                       (zf1 + zf2).convert(nport.Y)
         else:
             self.z2 = 0.5 * (z21_s1__ + z12_s1__)
-            self.zi_plus_z1 = (z11_s1__ - self.z2) / (1.0 + alpha)
+            self.zi_plus_z1 = (z11_s1__ - self.z2) / (1.0 + self.alpha)
             z3 = z21_o__ + z11_o__ - 2.0 * self.z2 - self.zi_plus_z1
             zf = z3 * (z3 / (z21o__ - self.z2) - 2.0)
             self.y3 = z3.convert(nport.Y)
@@ -207,9 +212,7 @@ class Kolding00(Deembedder):
         z_full = measurement.convert(nport.Z)
         z__ = self._remove_pads(z_full)
 
-        if kol00_asym:
-            print("WARNING: de-embedding method adjusted for asymmetrical fixtures")
-            print("WARNING: might NOT be CORRECT")
+        if self.asymmetric:
             z___ = z__ - (self.zi_plus_z1 + self.z2)
             y___ = z___.convert(nport.Y)
             y_dut = y___ - (self.y3 - self.yf)
