@@ -83,6 +83,29 @@ class TestTwoNPort(unittest.TestCase):
         maxerror = np.max(np.abs(self.abcd1 - abcd2))
         self.assertAlmostEqual(maxerror, 0, 11)
 
+    def test_convert_t_to_abcd_to_t(self):
+        maxerror = self._convert_max_error(self.t1, nport.ABCD)
+        self.assertAlmostEqual(maxerror, 0, 12)
+
+    def test_convert_t_to_abcd_to_t_diffz0_renormalize(self):
+        abcd = self.t1.convert(nport.ABCD)
+        t2 = abcd.convert(nport.T, 60)
+        t3 = t2.renormalize(50)
+        error = np.abs(self.t1 - t3)
+        maxerror = np.max(error)
+        self.assertAlmostEqual(maxerror, 0, 12)
+
+    def test_convert_abcd_to_t_to_abcd(self):
+        maxerror = self._convert_max_error(self.abcd1, nport.T)
+        self.assertAlmostEqual(maxerror, 0, 11)
+
+    def test_convert_abcd_to_t_renormalize_to_abcd(self):
+        t = self.abcd1.convert(nport.T)
+        t2 = t.renormalize(60)
+        abcd2 = t2.convert(nport.ABCD)
+        maxerror = np.max(np.abs(self.abcd1 - abcd2))
+        self.assertAlmostEqual(maxerror, 0, 11)
+
     def test_convert_z_to_abcd_to_z(self):
         maxerror = self._convert_max_error(self.z1, nport.ABCD)
         self.assertAlmostEqual(maxerror, 0, 12)

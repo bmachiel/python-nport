@@ -27,8 +27,22 @@ class TestNPort(unittest.TestCase):
     def test_s_renormalize(self):
         s2 = self.s1.convert(nport.S, 60)
         s3 = s2.convert(nport.S, 50)
-        error = np.abs(self.s1 - s3)
-        maxerror = np.max(error)
+        maxerror = np.max(np.abs(self.s1 - s3))
+        self.assertAlmostEqual(maxerror, 0, 12)
+
+    def test_convert_z_to_z(self):
+        z2 = self.z1.convert(nport.Z)
+        maxerror = np.max(np.abs(self.z1 - z2))
+        self.assertAlmostEqual(maxerror, 0, 12)
+
+    def test_convert_y_to_y(self):
+        y2 = self.y1.convert(nport.Y)
+        maxerror = np.max(np.abs(self.y1 - y2))
+        self.assertAlmostEqual(maxerror, 0, 12)
+
+    def test_convert_s_to_s(self):
+        s2 = self.s1.convert(nport.S)
+        maxerror = np.max(np.abs(self.s1 - s2))
         self.assertAlmostEqual(maxerror, 0, 12)
 
     def test_convert_z_to_y_to_z(self):

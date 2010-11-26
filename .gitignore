@@ -3,5 +3,7 @@ dist
 nport.egg-info
 nport/version.py
 doc/_build
+coverage
+.coverage
 *.pyc
 *~
