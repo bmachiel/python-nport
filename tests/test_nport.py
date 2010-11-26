@@ -63,7 +63,7 @@ class TestNPort(unittest.TestCase):
        
     def test_convert_y_to_s_to_y(self):
         maxerror = self._convert_max_error(self.y1, nport.S)
-        self.assertAlmostEqual(maxerror, 0, 11)
+        self.assertAlmostEqual(maxerror, 0, 12)
        
     def test_convert_s_to_y_to_s(self):
         maxerror = self._convert_max_error(self.s1, nport.Y)

@@ -323,9 +323,9 @@ class NPortMatrix(NPortMatrixBase):
         # TODO: check for singularities
         if self.type == SCATTERING:
             if type == IMPEDANCE:
-                result = self.z0 * (2 * invert(idty - self) - idty)
+                result = (2 * invert(idty - self) - idty) * self.z0
             elif type == ADMITTANCE:
-                result = 1 / self.z0 * np.dot(invert(idty + self), idty - self)
+                result = (2 * invert(idty + self) - idty) / self.z0
             elif type == SCATTERING:
                 if z0 == self.z0:
                     result = self
@@ -340,7 +340,7 @@ class NPortMatrix(NPortMatrixBase):
                 result = self
         elif self.type == ADMITTANCE:
             if type == SCATTERING:
-                result = np.dot(idty - (z0 * self), invert(idty + (z0 * self)))
+                result = 2 * invert(idty + self * z0) - idty
             elif type == IMPEDANCE:
                 result = invert(self)
             elif type == ADMITTANCE:

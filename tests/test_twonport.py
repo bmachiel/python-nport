@@ -131,14 +131,14 @@ class TestTwoNPort(unittest.TestCase):
         t2 = t.renormalize(60)
         z2 = t2.convert(nport.Z)
         maxerror = np.max(np.abs(self.z1 - z2))
-        self.assertAlmostEqual(maxerror, 0, 11)
+        self.assertAlmostEqual(maxerror, 0, 12)
 
     def test_convert_z_to_s_renormalize_to_z(self):
         s = self.z1.convert(nport.S)
         s2 = s.renormalize(60)
         z2 = s2.convert(nport.Z)
         maxerror = np.max(np.abs(self.z1 - z2))
-        self.assertAlmostEqual(maxerror, 0, 11)
+        self.assertAlmostEqual(maxerror, 0, 12)
 
     def test_convert_t_to_z_to_t(self):
         maxerror = self._convert_max_error(self.t1, nport.Z)
@@ -154,7 +154,7 @@ class TestTwoNPort(unittest.TestCase):
 
     def test_convert_y_to_s_to_y(self):
         maxerror = self._convert_max_error(self.y1, nport.S)
-        self.assertAlmostEqual(maxerror, 0, 9)
+        self.assertAlmostEqual(maxerror, 0, 12)
 
     def test_convert_y_to_t_renormalize_to_y(self):
         t = self.y1.convert(nport.T)
