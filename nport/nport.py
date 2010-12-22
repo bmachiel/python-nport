@@ -220,13 +220,15 @@ class NPortBase(NPortMatrixBase):
 
 
 class NPortMatrix(NPortMatrixBase):
-    """Class representing an n-port matrix (Z, Y, S, T, G, H or ABCD)"""
+    """Class representing an n-port matrix (Z, Y or S)"""
     def __new__(cls, matrix, type, z0=None):
         obj = NPortMatrixBase.__new__(cls, matrix, type, z0)
         if len(obj.shape) != 2:
             raise ValueError("the matrix should be two-dimensional")
         if obj.shape[0] != obj.shape[1]:
             raise ValueError("the matrix should be square")
+        if matrix.shape[0] == 2:
+            obj.__class__ = TwoPortMatrix
         return obj
 
     @property
@@ -287,16 +289,21 @@ class NPortMatrix(NPortMatrixBase):
         """Renormalize the n-port parameters to `z0`"""
         # http://qucs.sourceforge.net/tech/node98.html
         # "Renormalization of S-parameters to different port impedances"
-        assert self.type == S
+        if self.type not in (S, T):
+            raise TypeError("Only S and T matrices can be renormalized")
+
         if z0 == self.z0:
             result = self
-        else:
+        elif self.type == S:
             idty = np.identity(len(self), dtype=complex)
 
             r = (z0 - self.z0) / (z0 + self.z0)
             result = self.__class__(np.dot(self - idty * r,
                                            np.linalg.inv(idty - r * self)),
                                     self.type, z0)
+        elif self.type == T:
+            result = self.convert(S, z0).convert(T)
+
         return result
 
     def convert(self, type, z0=None):
@@ -318,19 +325,20 @@ class NPortMatrix(NPortMatrixBase):
                             "representation. Convert to a TwoNPort first" %
                             type)
         elif type not in (Z, Y, S):
-            raise TypeError("Unknown n-port parameter type.")
+            raise TypeError("Unknown n-port parameter type")
+        elif type in (H, G):
+            if self.ports != 2:
+                raise TypeError("Can only convert 2x2 matrices to %s-parameter "
+                                "representation" % type)
 
         # TODO: check for singularities
         if self.type == SCATTERING:
-            if type == IMPEDANCE:
+            if type == SCATTERING:
+                return self.renormalize(z0)
+            elif type == IMPEDANCE:
                 result = (2 * invert(idty - self) - idty) * self.z0
             elif type == ADMITTANCE:
                 result = (2 * invert(idty + self) - idty) / self.z0
-            elif type == SCATTERING:
-                if z0 == self.z0:
-                    result = self
-                else:
-                    return self.renormalize(z0)
         elif self.type == IMPEDANCE:
             if type == SCATTERING:
                 result = idty - 2 * invert(idty + self / z0)
@@ -423,6 +431,164 @@ class NPortMatrix(NPortMatrixBase):
         raise NotImplementedError
 
 
+class TwoPortMatrix(NPortMatrix):
+    """Class representing a 2-port matrix (Z, Y, S, T, G, H or ABCD)"""
+    def convert(self, type, z0=None):
+        """Convert to another n-port matrix representation"""
+        # references:
+        #  * http://qucs.sourceforge.net/tech/node98.html
+        #           "Transformations of n-Port matrices"
+        z0 = self.convert_z0test(type, z0)
+        idty = np.identity(len(self), dtype=complex)
+        invert = np.linalg.inv
+
+        if type not in (Z, Y, S, T, H, G, ABCD):
+            raise TypeError("Unknown 2-port parameter type")
+
+        # TODO: check for singularities (condition number)
+        result = None
+        if self.type == SCATTERING:
+            s11 = self[0, 0]
+            s12 = self[0, 1]
+            s21 = self[1, 0]
+            s22 = self[1, 1]
+            if type == HYBRID:
+                h11 = ((1 + s11) * (1 + s22) - s12 * s21) * self.z0
+                h12 = 2 * s12
+                h21 = -2 * s21
+                h22 = ((1 - s11) * (1 - s22) - s12 * s21) / self.z0
+                d = (1 - s11) * (1 + s22) + s12 * s21
+                result = np.asarray([[h11, h12], [h21, h22]]) / d
+            elif type == INVERSE_HYBRID:
+                g11 = ((1 - s11) * (1 - s22) - s12 * s21) / self.z0
+                g12 = -2 * s12
+                g21 = 2 * s21
+                g22 = ((1 + s11) * (1 + s22) - s12 * s21) * self.z0
+                d = (1 + s11) * (1 - s22) + s12 * s21
+                result = np.asarray([[g11, g12], [g21, g22]]) / d
+        elif self.type == SCATTERING_TRANSFER:
+            t11 = self[0, 0]
+            t12 = self[0, 1]
+            t21 = self[1, 0]
+            t22 = self[1, 1]
+            if type == HYBRID:
+                h11 = (- t11 + t12 - t21 + t22) * self.z0
+                h12 = - 2 * (t11 * t22 - t12 * t21)
+                h21 = - 2
+                h22 = (t11 + t12 - t21 - t22) / self.z0
+                d = - t11 + t12 + t21 - t22
+                result = np.asarray([[h11, h12], [h21, h22]]) / d
+            elif type == INVERSE_HYBRID:
+                g11 = (t11 + t12 - t21 - t22) / self.z0
+                g12 = 2 * (t11 * t22 - t12 * t21)
+                g21 = 2
+                g22 = (- t11 + t12 - t21 + t22) * self.z0
+                d = t11 + t12 + t21 + t22
+                result = np.asarray([[g11, g12], [g21, g22]]) / d
+        elif self.type == IMPEDANCE:
+            z11 = self[0, 0]
+            z12 = self[0, 1]
+            z21 = self[1, 0]
+            z22 = self[1, 1]
+            dz = z11 * z22 - z12 * z21
+            if type == HYBRID:
+                result = np.asarray([[dz, z12], [-z21, 1]]) / z22
+            elif type == INVERSE_HYBRID:
+                result = np.asarray([[1, -z12], [z21, dz]]) / z11
+        elif self.type == ADMITTANCE:
+            y11 = self[0, 0]
+            y12 = self[0, 1]
+            y21 = self[1, 0]
+            y22 = self[1, 1]
+            dy = y11 * y22 - y12 * y21
+            if type == HYBRID:
+                result = np.asarray([[1, -y12], [y21, dy]]) / y11
+            elif type == INVERSE_HYBRID:
+                result = np.asarray([[dy, y12], [-y21, 1]]) / y22
+        if self.type == TRANSMISSION:
+            a11 = self[0, 0]
+            a12 = self[0, 1]
+            a21 = self[1, 0]
+            a22 = self[1, 1]
+            da = a11 * a22 - a12 * a21
+            if type == HYBRID:
+                result = np.asarray([[a12, da], [-1, a21]]) / a22
+            elif type == INVERSE_HYBRID:
+                result = np.asarray([[a21, -da], [1, a12]]) / a11
+        elif self.type == HYBRID:
+            h11 = self[0, 0]
+            h12 = self[0, 1]
+            h21 = self[1, 0]
+            h22 = self[1, 1]
+            dh = h11 * h22 - h12 * h21
+            if type == SCATTERING:
+                h11_ = h11 / z0
+                h22_ = h22 * z0
+                s11 = (h11_ - 1) * (1 + h22_) - h12 * h21
+                s12 = 2 * h12
+                s21 = -2 * h21
+                s22 = (h11_ + 1) * (1 - h22_) + h12 * h21
+                d = (h11_ + 1) * (1 + h22_) - h12 * h21
+                result = np.asarray([[s11, s12], [s21, s22]]) / d
+            elif type == SCATTERING_TRANSFER:
+                h11_ = h11 / z0
+                h22_ = h22 * z0
+                t11 = + (h11_ + 1) * (1 - h22_) + h12 * h21
+                t12 = - (h11_ + 1) * (1 + h22_) + h12 * h21
+                t21 = + (h11_ - 1) * (1 - h22_) + h12 * h21
+                t22 = - (h11_ - 1) * (1 + h22_) + h12 * h21
+                result = np.asarray([[t11, t12], [t21, t22]]) / (2 * h21)
+            elif type == IMPEDANCE:
+                result = np.asarray([[dh, h12], [-h21, 1]]) / h22
+            elif type == ADMITTANCE:
+                result = np.asarray([[1, -h12], [h21, dh]]) / h11
+            elif type == TRANSMISSION:
+                result = np.asarray([[-dh, -h11], [-h22, -1]]) / h21
+            elif type == HYBRID:
+                result = self
+            elif type == INVERSE_HYBRID:
+                result = np.asarray([[h22, -h12], [-h21, h11]]) / dh
+        elif self.type == INVERSE_HYBRID:
+            g11 = self[0, 0]
+            g12 = self[0, 1]
+            g21 = self[1, 0]
+            g22 = self[1, 1]
+            dg = g11 * g22 - g12 * g21
+            if type == SCATTERING:
+                g11_ = g11 * z0
+                g22_ = g22 / z0
+                s11 = (1 - g11_) * (g22_ + 1) + g12 * g21
+                s12 = -2 * g12
+                s21 = 2 * g21
+                s22 = (1 + g11_) * (g22_ - 1) - g12 * g21
+                d = (1 + g11_) * (g22_ + 1) - g12 * g21
+                result = np.asarray([[s11, s12], [s21, s22]]) / d
+            elif type == SCATTERING_TRANSFER:
+                g11_ = g11 * z0
+                g22_ = g22 / z0
+                t11 = + (g11_ + 1) * (1 - g22_) + g12 * g21
+                t12 = + (g11_ + 1) * (1 + g22_) - g12 * g21
+                t21 = - (g11_ - 1) * (1 - g22_) - g12 * g21
+                t22 = - (g11_ - 1) * (1 + g22_) + g12 * g21
+                result = np.asarray([[t11, t12], [t21, t22]]) / (2 * g21)
+            elif type == IMPEDANCE:
+                result = np.asarray([[1, -g12], [g21, dg]]) / g11
+            elif type == ADMITTANCE:
+                result = np.asarray([[dg, g12], [-g21, 1]]) / g22
+            elif type == TRANSMISSION:
+                result = np.asarray([[1, g22], [g11, dg]]) / g21
+            elif type == HYBRID:
+                result = np.asarray([[g22, -g12], [-g21, g11]]) / dg
+            elif type == INVERSE_HYBRID:
+                result = self
+                
+        if result is not None:
+            return NPortMatrix(result, type, z0)
+        else:
+            nportmatrix = super(self.__class__, self)
+            return nportmatrix.twonportmatrix().convert(type, z0).nportmatrix()
+
+
 class NPort(NPortBase):
     """Class representing an n-port across a list of frequencies"""
     def __new__(cls, freqs, matrices, type, z0=None):
@@ -481,7 +647,9 @@ class NPort(NPortBase):
 
     def renormalize(self, z0):
         """Renormalize the n-port parameters to `z0`"""
-        assert self.type == S
+        if self.type not in (S, T):
+            raise TypeError("Only S and T matrices can be renormalized")
+
         if z0 == self.z0:
             result = self
         else:

@@ -96,7 +96,6 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
             s12 = t22 - t21 * t11i * t12
             s21 = t11i
             s22 = - t11i * t12
-            # TODO
             result = self.__class__([[s11, s12], [s21, s22]], S, self.z0)
             if z0 != self.z0:
                 result = result.renormalize(z0)
@@ -205,7 +204,10 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
             y = s.convert(Y)
             return y.twonportmatrix()
         else:
-            result = self.nportmatrix().convert(type, z0)
+            nportmatrix = self.nportmatrix()
+            # catch infinite recursion for TwoPortMatrix
+            nportmatrix.__class__ = nport.NPortMatrix
+            result = nportmatrix.convert(type, z0)
             return result.twonportmatrix()
 
         return result
