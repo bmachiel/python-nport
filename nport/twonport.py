@@ -9,6 +9,7 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
     """Class representing a 2n-port matrix (Z, Y, S, T, G, H or ABCD)"""
     # See also "block matrices" in the Matrix Cookbook
     def __new__(cls, matrix, type, z0=None):
+        matrix = np.asarray(matrix, dtype=complex)
         obj = nport.NPortMatrixBase.__new__(cls, matrix, type, z0)
         if len(obj.shape) != 4:
             raise ValueError("the matrix should be four-dimensional")
@@ -216,6 +217,7 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
 class TwoNPort(nport.NPortBase):
     """Class representing a 2n-port across a list of frequencies"""
     def __new__(cls, freqs, matrices, type, z0=None):
+        matrices = np.asarray(matrices, dtype=complex)
         obj = nport.NPortBase.__new__(cls, freqs, matrices, type, z0)
         if len(obj[0].shape) != 4:
             raise ValueError("the matrices should be four-dimensional")

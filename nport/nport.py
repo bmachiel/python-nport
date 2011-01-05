@@ -32,7 +32,7 @@ class NPortMatrixBase(np.ndarray):
     # TODO: implement type checking for operations (as in NPortBase)
     def __new__(cls, matrix, type, z0=None):
         # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
-        obj = np.asarray(matrix, dtype=complex).view(cls)
+        obj = matrix.view(cls)
         if type not in (Z, Y, S, T, H, G, ABCD):
             raise ValueError("illegal matrix type specified")
         obj.type = type
@@ -57,6 +57,15 @@ class NPortMatrixBase(np.ndarray):
                              "not require a reference impedance" % type)
         return z0
 
+    def __repr__(self):
+        array_repr = repr(self.view(np.ndarray))[6:-1].replace('\n     ', '\n')
+        attrs = 'type=%s' % self.type
+        if self.type in (S, T):
+            attrs += ', z0=%g' % self.z0
+        return '%s(%s)\n %s' % (self.__class__.__name__,
+                                attrs,
+                                array_repr)
+    
     def __array_finalize__(self, obj):
         if obj is None: return
         self.type = getattr(obj, 'type', None)
@@ -220,8 +229,18 @@ class NPortBase(NPortMatrixBase):
 
 
 class NPortMatrix(NPortMatrixBase):
-    """Class representing an n-port matrix (Z, Y or S)"""
+    """Class representing an n-port matrix (Z, Y or S)
+    
+    :param matrix: matrix elements
+    :type matrix: iterable
+    :param type: matrix type
+    :type type: Z, Y or S
+    :param z0: normalizing impedance (only S)
+    :type z0: float
+
+    """
     def __new__(cls, matrix, type, z0=None):
+        matrix = np.asarray(matrix, dtype=complex)
         obj = NPortMatrixBase.__new__(cls, matrix, type, z0)
         if len(obj.shape) != 2:
             raise ValueError("the matrix should be two-dimensional")
@@ -324,12 +343,12 @@ class NPortMatrix(NPortMatrixBase):
             raise TypeError("Cannot convert an NPort to %s-parameter "
                             "representation. Convert to a TwoNPort first" %
                             type)
-        elif type not in (Z, Y, S):
-            raise TypeError("Unknown n-port parameter type")
         elif type in (H, G):
             if self.ports != 2:
                 raise TypeError("Can only convert 2x2 matrices to %s-parameter "
                                 "representation" % type)
+        elif type not in (Z, Y, S):
+            raise TypeError("Unknown n-port parameter type")
 
         # TODO: check for singularities
         if self.type == SCATTERING:
@@ -434,7 +453,7 @@ class NPortMatrix(NPortMatrixBase):
 class TwoPortMatrix(NPortMatrix):
     """Class representing a 2-port matrix (Z, Y, S, T, G, H or ABCD)"""
     def convert(self, type, z0=None):
-        """Convert to another n-port matrix representation"""
+        """Convert to another 2-port matrix representation"""
         # references:
         #  * http://qucs.sourceforge.net/tech/node98.html
         #           "Transformations of n-Port matrices"
@@ -592,6 +611,7 @@ class TwoPortMatrix(NPortMatrix):
 class NPort(NPortBase):
     """Class representing an n-port across a list of frequencies"""
     def __new__(cls, freqs, matrices, type, z0=None):
+        matrices = np.asarray(matrices, dtype=complex)
         obj = NPortBase.__new__(cls, freqs, matrices, type, z0)
         if len(obj[0].shape) != 2:
             raise ValueError("the matrices should be two-dimensional")
@@ -770,6 +790,5 @@ def dot(arg1, arg2):
                                  arg1.z0)
     elif type(arg2) == NPort:
         raise NotImplementedError
-        
-        
-    raise NotImplementedError
+    else:
+        np.dot(arg1, arg2)
