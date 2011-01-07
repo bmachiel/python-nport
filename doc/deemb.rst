@@ -9,6 +9,11 @@ Introduction
 
 This module implements a number of de-embedding methods. Each de-embedding
 method is implemented as a subclass of :class:`nport.deemb.Deembedder`.
+Currently, only a few de-embedding methods are included with :mod:`nport` (see 
+:ref:`de-embedding_methods` below).
+
+Usage
+-----
 
 A :class:`Deembedder` object is instantiated by passing the n-port parameters of 
 the method's dummy structures. The resulting :class:`Deembedder` object can then
@@ -43,6 +48,12 @@ de-embedding method::
     touchstone.write(deemb16, "nmos_W16_L80_Vg10_Vd12_deembedded")
     touchstone.write(deemb32, "nmos_W32_L80_Vg10_Vd12_deembedded")
     touchstone.write(deemb64, "nmos_W64_L80_Vg10_Vd12_deembedded")
+    
+Other de-embedding methods require more dummy structures. Aside from having to
+pass more arguments when instantiating the :class:`Deembedder` object, the
+de-embedding script looks the same.
+
+.. _de-embedding_methods:
 
 De-embedding methods
 --------------------

@@ -1,3 +1,5 @@
+.. _touchstone:
+
 :mod:`nport.touchstone` --- Touchstone
 ======================================
 
