@@ -39,7 +39,7 @@ class TwoStep(Deembedder):
         self.z_so = (y_short - self.y_open).convert(nport.Z)
 
     def deembed(self, measurement):
-        y_full = measurements.convert(nport.Y)
+        y_full = measurement.convert(nport.Y)
         z_ = (y_full - self.y_open).convert(nport.Z)
         z_dut = z_ - self.z_so
         
@@ -204,9 +204,9 @@ class Kolding00(Deembedder):
             self.z2 = 0.5 * (z21_s1__ + z12_s1__)
             self.zi_plus_z1 = (z11_s1__ - self.z2) / (1.0 + self.alpha)
             z3 = z21_o__ + z11_o__ - 2.0 * self.z2 - self.zi_plus_z1
-            zf = z3 * (z3 / (z21o__ - self.z2) - 2.0)
+            zf = z3 * (z3 / (z21_o__ - self.z2) - 2.0)
             self.y3 = z3.convert(nport.Y)
-            self.yf = Zf.convert(nport.Y)
+            self.yf = zf.convert(nport.Y)
 
     def deembed(self, measurement):
         z_full = measurement.convert(nport.Z)
