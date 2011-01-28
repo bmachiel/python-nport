@@ -9,8 +9,21 @@ data_dir = os.path.split(__file__)[0] + os.path.sep + 'data' + os.path.sep
 
 class TestDeemb(unittest.TestCase):
     def setUp(self):
+        # the device under test to be extracted using the deembedding techniques
         self.dut = touchstone.read(data_dir + 'deemb_dut.s2p')
+        
+        # 2-port parameters for the ADS Momentum tests
+        self.mom_embedded = touchstone.read(data_dir + 'deemb_mom.s2p')
+        self.mom_simple_open = touchstone.read(data_dir + 'deemb_mom_simple_open.s2p')
+        self.mom_simple_short = touchstone.read(data_dir + 'deemb_mom_simple_short.s2p')
+        self.mom_open = touchstone.read(data_dir + 'deemb_mom_open.s2p')
+        self.mom_short = touchstone.read(data_dir + 'deemb_mom_short.s2p')
+        self.mom_short1 = touchstone.read(data_dir + 'deemb_mom_short1.s2p')
+        self.mom_short2 = touchstone.read(data_dir + 'deemb_mom_short2.s2p')
+        self.mom_through = touchstone.read(data_dir + 'deemb_mom_through.s2p')
 
+    # Lumped test structures that have a 1-1 correspondence to the parameters
+    # in the deembedding algorithms
     def test_twostep(self):
         embedded = touchstone.read(data_dir + 'deemb_twostep.s2p')
         open = touchstone.read(data_dir + 'deemb_twostep_open.s2p')
@@ -45,6 +58,30 @@ class TestDeemb(unittest.TestCase):
         touchstone.write(deembedded, data_dir + 'deemb_kolding00_deembedded', 'MA')
         maxerror = self.error(deembedded)
         self.assertAlmostEqual(maxerror, 0, 2)
+
+    # Deembedding from a realistic test fixture simulated in ADS Momentum
+    def test_mom_twostep(self):
+        deembedder = TwoStep(self.mom_open, self.mom_short)
+        deembedded = deembedder.deembed(self.mom_embedded)
+        touchstone.write(deembedded, data_dir + 'deemb_mom_deembedded_twostep', 'MA')
+        maxerror = self.error(deembedded)
+        self.assertAlmostEqual(maxerror, 0, 4)
+
+    def test_mom_vandamme01(self):
+        deembedder = Vandamme01(self.mom_open, self.mom_short1,
+                                self.mom_short2, self.mom_through)
+        deembedded = deembedder.deembed(self.mom_embedded)
+        touchstone.write(deembedded, data_dir + 'deemb_mom_deembedded_vandamme01', 'MA')
+        maxerror = self.error(deembedded)
+        self.assertAlmostEqual(maxerror, 0, 4)
+
+    def test_mom_kolding00(self):
+        deembedder = Kolding00(self.mom_simple_open, self.mom_simple_short,
+                               self.mom_open, self.mom_short1, self.mom_short2)
+        deembedded = deembedder.deembed(self.mom_embedded)
+        touchstone.write(deembedded, data_dir + 'deemb_mom_deembedded_kolding00', 'MA')
+        maxerror = self.error(deembedded)
+        self.assertAlmostEqual(maxerror, 0, 4)
 
     # support methods
     def error(self, deembedded):
