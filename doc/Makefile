@@ -32,15 +32,18 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 	(cd $(IMAGESDIR); $(MAKE) clean)
 
-images:
-	(cd $(IMAGESDIR); $(MAKE))
+pngimages:
+	(cd $(IMAGESDIR); $(MAKE) png)
 
-html: images
+pdfimages:
+	(cd $(IMAGESDIR); $(MAKE) pdf)
+
+html: pngimages
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
-dirhtml: images
+dirhtml: pngimages
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/dirhtml."
@@ -55,7 +58,7 @@ json:
 	@echo
 	@echo "Build finished; now you can process the JSON files."
 
-htmlhelp: images
+htmlhelp: pngimages
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) $(BUILDDIR)/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
@@ -70,7 +73,7 @@ qthelp:
 	@echo "To view the help file:"
 	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/nport.qhc"
 
-latex:
+latex: pdfimages
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo
 	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."

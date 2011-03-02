@@ -18,9 +18,6 @@ The RLGC parameters are calculated from the propagation constant and
 characteristic impedance as detailed in [EIS92]_.
 
 
-References
-----------
-
 .. [EIS92] "S-Parameter-Based IC Interconnect Transmission Line
            Characterization"
            by William R. Eisenstadt and Yungseon Eo

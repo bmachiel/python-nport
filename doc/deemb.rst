@@ -61,14 +61,36 @@ De-embedding methods
 Two-step de-embedding
 ^^^^^^^^^^^^^^^^^^^^^
 
+This class implements basic open-short deembedding.
+
 .. autoclass:: nport.deemb.TwoStep
 
 Vandamme three-step de-embedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This class implements the three-step deembedding algorithm by Vandamme et al.
+[VAN01]_.
 
 .. autoclass:: nport.deemb.Vandamme01
 
 Kolding four-step de-embedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+This class implements the three-step deembedding algorithm by Kolding [KOL00]_.
+
 .. autoclass:: nport.deemb.Kolding00
+
+
+.. [VAN01] "Improved Three-Step De-Embedding Method to Accurately Account for
+           the Influence of Pad Parasitics in Silicon On-Wafer RF
+           Test-Structures"
+           by Ewout P. Vandamme, Dominique M. M.-P. Schreurs,
+           and Cees van Dinther
+           in *IEEE Transactions on Electron Devices*,
+           vol. 48, no. 4, pp. 737-742, 2001
+
+.. [KOL00] "A Four-Step Method for De-Embedding Gigahertz On-Wafer CMOS
+           Measurements"
+           by Troels Emil Kolding
+           in *IEEE Transactions on Electron Devices*,
+           vol. 47, no. 4, pp. 734-740, 2000
