@@ -320,7 +320,7 @@ class TestTwoPort(unittest.TestCase):
     # Y-parameter renormalization ----------------------------------------------
     def test_convert_y_to_s_renormalize_to_y(self):
         maxerror = convert_renormalize_convert(self.y1, nport.S, 60)
-        self.assertAlmostEqual(maxerror, 0, 12)
+        self.assertAlmostEqual(maxerror, 0, 11)
 
     def test_convert_y_to_t_renormalize_to_y(self):
         maxerror = convert_renormalize_convert(self.y1, nport.T, 60)
@@ -367,7 +367,7 @@ class TestTwoPort(unittest.TestCase):
     # T-parameter renormalization ----------------------------------------------
     def test_convert_t_to_z_to_t_renormalize(self):
         maxerror = convert_convert_renormalize(self.t1, nport.Z, 60)
-        self.assertAlmostEqual(maxerror, 0, 14)
+        self.assertAlmostEqual(maxerror, 0, 13)
 
     def test_convert_t_to_y_to_t_renormalize(self):
         maxerror = convert_convert_renormalize(self.t1, nport.Y, 60)
