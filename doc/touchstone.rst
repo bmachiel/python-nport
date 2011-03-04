@@ -11,6 +11,6 @@
 Functions
 ---------
 
-.. autofunction:: nport.touchstone.read
+.. autofunction:: read
 
-.. autofunction:: nport.touchstone.write
+.. autofunction:: write

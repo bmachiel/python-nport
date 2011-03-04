@@ -8,8 +8,8 @@ Introduction
 ------------
 
 This module implements a number of de-embedding methods. Each de-embedding
-method is implemented as a subclass of :class:`nport.deemb.Deembedder`.
-Currently, only a few de-embedding methods are included with :mod:`nport` (see 
+method is implemented as a subclass of :class:`Deembedder`. Currently, only a
+few de-embedding methods are included with :mod:`nport` (see
 :ref:`de-embedding_methods` below).
 
 Usage
@@ -63,7 +63,7 @@ Two-step de-embedding
 
 This class implements basic open-short deembedding.
 
-.. autoclass:: nport.deemb.TwoStep
+.. autoclass:: TwoStep
 
 Vandamme three-step de-embedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -71,14 +71,14 @@ Vandamme three-step de-embedding
 This class implements the three-step deembedding algorithm by Vandamme et al.
 [VAN01]_.
 
-.. autoclass:: nport.deemb.Vandamme01
+.. autoclass:: Vandamme01
 
 Kolding four-step de-embedding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This class implements the three-step deembedding algorithm by Kolding [KOL00]_.
 
-.. autoclass:: nport.deemb.Kolding00
+.. autoclass:: Kolding00
 
 
 .. [VAN01] "Improved Three-Step De-Embedding Method to Accurately Account for

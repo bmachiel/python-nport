@@ -5,8 +5,20 @@ import nport
 
 from nport import Z, Y, S, T, ABCD
 
+
 class TwoNPortMatrix(nport.NPortMatrixBase):
-    """Class representing a 2n-port matrix (Z, Y, S, T, G, H or ABCD)"""
+    """Class representing a 2n-port matrix (Z, Y, S, T or ABCD)
+
+    :param freqs: list of frequency samples
+    :type freqs: :class:`list`
+    :param matrix: matrix elements
+    :type matrix: 2 by 2 array where each element is an *n* by *n* array
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T` or :data:`ABCD`
+    :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+    :type z0: :class:`float`
+
+    """
     # See also "block matrices" in the Matrix Cookbook
     def __new__(cls, matrix, type, z0=None):
         matrix = np.asarray(matrix, dtype=complex)
@@ -21,15 +33,30 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
 
     @property
     def ports(self):
+        """The number of ports of this :class:`TwoNPortMatrix`
+        
+        :rtype: :class:`int`
+        
+        """
         return 2 * self.shape[2]
 
     def nportmatrix(self):
+        """Convert this :class:`TwoNPortMatrix` to an :class:`NPortMatrix`
+        
+        :rtype: :class:`NPortMatrix`
+        
+        """
         matrix = np.vstack((np.hstack((self[0,0], self[0,1])),
             np.hstack((self[1,0], self[1,1]))))
         return nport.NPortMatrix(matrix, self.type, self.z0)
 
     def renormalize(self, z0):
-        """Renormalize the 2n-port parameters to `z0`"""
+        """Renormalize the 2n-port parameters to `z0`
+        
+        :param z0: new normalizing impedance
+        :type z0: :class:`float`
+        
+        """
         assert self.type in (S, T)
         if z0 == self.z0:
             result = self
@@ -40,7 +67,14 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
         return result
 
     def convert(self, type, z0=None):
-        """Convert from one 2n-port matrix representation to another"""
+        """Convert from one 2n-port matrix representation to another
+        
+        :param type: new matrix type
+        :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T` or :data:`ABCD`
+        :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+        :type z0: :class:`float`
+
+        """
         z0 = self.convert_z0test(type, z0)
         idty = np.identity(self.shape[2], dtype=complex)
         invert = np.linalg.inv
@@ -215,7 +249,17 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
 
 
 class TwoNPort(nport.NPortBase):
-    """Class representing a 2n-port across a list of frequencies"""
+    """Class representing a 2n-port across a list of frequencies
+
+    :param matrices: list of matrix elements
+    :type matrix: list of 2 by 2 arrays in which each element is an
+                  *n* by *n* array
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T` or :data:`ABCD`
+    :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+    :type z0: :class:`float`
+
+    """
     def __new__(cls, freqs, matrices, type, z0=None):
         matrices = np.asarray(matrices, dtype=complex)
         obj = nport.NPortBase.__new__(cls, freqs, matrices, type, z0)
@@ -227,33 +271,35 @@ class TwoNPort(nport.NPortBase):
             raise ValueError("the submatrices should be square")
         return obj
 
-    def __init__(self, freqs, matrices, type, z0=50):
-        """
-        Initialize an instance, specifying the frequency samples, all
-        corresponsing matrices, the matrix type and the reference impedance
-
-        """
-        pass
-
     def __getitem__(self, arg):
         if type(arg) == int:
-            return TwoNPortMatrix(np.asarray(self).__getitem__(arg), self.type, self.z0)
+            return TwoNPortMatrix(np.asarray(self).__getitem__(arg), self.type,
+                                  self.z0)
         else:
             return np.asarray(self).__getitem__(arg)
 
     @property
     def ports(self):
-        """Return the number of ports of this TwoNPort"""
+        """The number of ports of this :class:`TwoNPort`
+        
+        :rtype: :class:`int`
+        
+        """
         return 2 * self[0].shape[2]
 
     def add(self, freq, matrix):
-        """
-        Return a TwoNPort with the specified frequency sample added
+        """Return a :class:`TwoNPort` with the specified frequency sample added.
 
-        If matrix is a TwoNPortMatrix, its elements will be converted to this
-        TwoNPort's type and characteristic impedance.
-        If matrix is a complex array, it is assumed the elements are in the
-        format of this TwoNPort
+        If `matrix` is a :class:`TwoNPortMatrix`, its elements will be converted
+        to this :class:`TwoNPort`'s type and characteristic impedance. If
+        `matrix` is a complex array, it is assumed the elements are in the
+        format of this :class:`TwoNPort`.
+        
+        :param freq: frequency at which to insert `matrix`
+        :type freq: :class:`float`
+        :param matrix: matrix to insert at `freq`
+        :type matrix: :class:`TwoNPortMatrix` or a complex array
+        :rtype: :class:`TwoNPort`
 
         """
         if type(matrix) == TwoNPortMatrix:
@@ -265,7 +311,11 @@ class TwoNPort(nport.NPortBase):
         return TwoNPort(freqs, matrices, self.type, self.z0)
 
     def nport(self):
-        """Convert this TwoNPort to an NPort"""
+        """Convert this :class:`TwoNPort` to an :class:`NPort`
+        
+        :rtype: :class:`NPort`
+
+        """
         nportmatrices = []
         for matrix in self:
             twonportmatrix = TwoNPortMatrix(matrix, self.type, self.z0)
@@ -273,7 +323,13 @@ class TwoNPort(nport.NPortBase):
         return nport.NPort(self.freqs, nportmatrices, self.type, self.z0)
 
     def renormalize(self, z0):
-        """Renormalize the 2n-port parameters to `z0`"""
+        """Renormalize the 2n-port parameters to `z0`
+        
+        :param z0: new normalizing impedance
+        :type z0: :class:`float`
+        :rtype: :class:`TwoNPort`
+        
+        """
         assert self.type in (S, T)
         if z0 == self.z0:
             result = self
@@ -286,7 +342,14 @@ class TwoNPort(nport.NPortBase):
         return result
 
     def convert(self, type, z0=None):
-        """Convert to another 2n-port matrix representation"""
+        """Convert to another 2n-port matrix representation
+        
+        :param type: new matrix type
+        :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T` or :data:`ABCD`
+        :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+        :type z0: :class:`float`
+
+        """
         converted = []
         for matrix in self:
             twonportmatrix = TwoNPortMatrix(matrix, self.type, self.z0)

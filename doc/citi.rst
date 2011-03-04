@@ -11,6 +11,6 @@
 Functions
 ---------
 
-.. autofunction:: nport.citi.read
+.. autofunction:: read
 
-.. autofunction:: nport.citi.write
+.. autofunction:: write

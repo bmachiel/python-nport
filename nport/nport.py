@@ -26,9 +26,17 @@ ABCD = TRANSMISSION = TYPE_ABCD = 'ABCD'
         #~ return "given type %s does not match expected type %s" % (self.given, self.expected)
 
 
-
 class NPortMatrixBase(np.ndarray):
-    """Base class representing an n-port matrix (Z, Y, S, T, G, H or ABCD)"""
+    """Base class representing an n-port matrix (Z, Y, S, T, G, H or ABCD)
+    
+    :type matrix: *n* by *n* array
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`,
+                :data:`H` or :data:`ABCD`
+    :param z0: normalizing impedance (only S)
+    :type z0: :class:`float`
+
+    """
     # TODO: implement type checking for operations (as in NPortBase)
     def __new__(cls, matrix, type, z0=None):
         # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
@@ -40,13 +48,14 @@ class NPortMatrixBase(np.ndarray):
         return obj
 
     def _z0test(self, type, z0):
-        """Verify if a normalizing impedance may be specified for the given
+        """Verify whether a normalizing impedance may be specified for the given
         n-port parameter type
         
         :param type: n-port parameter type
-        :type type: Z, Y, S, ABCD or T
-        :param z0: normalizing impedance (for S or T)
-        :type z0: float
+        :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`,
+                    :data:`H` or :data:`ABCD`
+        :param z0: normalizing impedance
+        :type z0: :class:`float`
         
         """
         if type in (S, T):
@@ -73,6 +82,11 @@ class NPortMatrixBase(np.ndarray):
 
     @property
     def ports(self):
+        """The number of ports of this :class:`NPortMatrixBase`
+        
+        :rtype: :class:`int`
+        
+        """
         raise NotImplementedError
     
     def convert_z0test(self, type, z0):
@@ -80,11 +94,13 @@ class NPortMatrixBase(np.ndarray):
         the type
         
         :param type: target type for conversion
-        :type type: Z, Y, S, T or ABCD
-        :param z0: target normalization impedance (for S and T types)
-        :type z0: float
+        :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`,
+                    :data:`H` or :data:`ABCD`
+        :param z0: target normalization impedance (only :data:`S` and :data:`T`)
+        :type z0: :class:`float`
         :returns: `z0` or default value when `z0 == None`
-        :rtype: float
+        :rtype: :class:`float`
+        
         """
         if type in (S, T):
             if z0 is None:
@@ -99,7 +115,20 @@ class NPortMatrixBase(np.ndarray):
 
 
 class NPortBase(NPortMatrixBase):
-    """Base class representing an n-port across a list of frequencies"""
+    """Base class representing an n-port across a list of frequencies
+
+    :param freqs: list of frequency samples
+    :type freqs: :class:`list`
+    :param matrices: list of matrix elements
+    :type matrix: list of 2 by 2 arrays in which each element is an 
+                  *n* by *n* array
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`, :data:`H`
+                or :data:`ABCD`
+    :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+    :type z0: :class:`float`
+
+    """
     def __metaclass__(cname, cbases, cdict):
         # http://thread.gmane.org/gmane.comp.python.general/373788/focus=373795
         P = type(cname, cbases, cdict)
@@ -170,6 +199,11 @@ class NPortBase(NPortMatrixBase):
         """Return the parameter as specified by the indices `port1` and `port2`
         as an ndarray
         
+        :type port1: :class:`int`
+        :type port2: :class:`int`
+        :returns: parameter at indices `port1` and `port2`
+        :rtype: :class:`ndarray`
+        
         """
         return np.asarray(self[:, port1 - 1, port2 - 1])
 
@@ -187,6 +221,11 @@ class NPortBase(NPortMatrixBase):
         """Return the interpolated n-port data at the given
         * list of frequencies (`freqs` is iterable), or
         * at a single frequency (`freqs` is a value)
+        
+        :param freqs: frequency point or list of frequencies at which to return
+                      the n-port matrices
+        :type freqs: :class:`float` or iterable of :class:`float`s
+        :rtype: `type(self)`
         
         """
         # check whether freqs is iterable
@@ -206,7 +245,13 @@ class NPortBase(NPortMatrixBase):
             return interpolated_nport
             
     def average(self, n):
-        """Take a moving average over `n` frequency samples"""
+        """Take a moving average over `n` frequency samples
+        
+        :param n: number of samples to average over
+        :type n: :class:`int`
+        :rtype: `type(self)`
+        
+        """
         averaged = np.zeros_like(np.asarray(self))
         for i in range(len(self)):
             for j in range(- int(np.floor(n/2)), int(np.ceil(n/2))):
@@ -229,15 +274,17 @@ class NPortBase(NPortMatrixBase):
 
 
 class NPortMatrix(NPortMatrixBase):
-    """Class representing an n-port matrix (Z, Y or S)
-    
-    :param matrix: matrix elements
-    :type matrix: iterable
-    :param type: matrix type
-    :type type: Z, Y or S
-    :param z0: normalizing impedance (only S)
-    :type z0: float
+    """Class representing an n-port matrix (Z, Y or S; for 2-ports also T, G,
+    H or ABCD)
 
+    :param matrix: matrix elements
+    :type matrix: *n* by *n* array
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`, :data:`H`
+                or :data:`ABCD`
+    :param z0: normalizing impedance (only :class:`S`)
+    :type z0: :class:`float`
+    
     """
     def __new__(cls, matrix, type, z0=None):
         matrix = np.asarray(matrix, dtype=complex)
@@ -252,16 +299,20 @@ class NPortMatrix(NPortMatrixBase):
 
     @property
     def ports(self):
-        """The number of ports in this NPortMatrix"""
+        """The number of ports in this NPortMatrix
+        
+        :rtype: :class:`int`
+        
+        """
         return self.shape[0]
 
     def twonportmatrix(self, inports=None, outports=None):
         """Return the 2n-port matrix represented by this n-port matrix
         
         :param inports: the list of ports that make up the inputs of the 2n-port
-        :type inports: tuple or list
+        :type inports: class:`tuple` or :class:`list`
         :param outports: the list of ports that make up the outputs
-        :type outports: tuple or list
+        :type outports: :class:`tuple` or :class:`list`
         :rtype: :class:`TwoNPortMatrix`
         
         """
@@ -305,7 +356,13 @@ class NPortMatrix(NPortMatrixBase):
         return twonport.TwoNPortMatrix(matrix, self.type, self.z0)
 
     def renormalize(self, z0):
-        """Renormalize the n-port parameters to `z0`"""
+        """Renormalize the n-port parameters to `z0`
+        
+        :param z0: new normalizing impedance
+        :type z0: :class:`float`
+        :rtype: :class:`NPortMatrix`
+        
+        """
         # http://qucs.sourceforge.net/tech/node98.html
         # "Renormalization of S-parameters to different port impedances"
         if self.type not in (S, T):
@@ -326,12 +383,20 @@ class NPortMatrix(NPortMatrixBase):
         return result
 
     def convert(self, type, z0=None):
-        """Convert to another n-port matrix representation"""
+        """Convert to another n-port matrix representation
+        
+        :param type: new matrix type
+        :type type: :class:`Z`, :class:`Y` or :class:`S`
+        :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+        :type z0: :class:`float`
+        :rtype: :class:`NPortMatrix`
+
+        """
         # references:
         #  * http://qucs.sourceforge.net/tech/node98.html
         #           "Transformations of n-Port matrices"
-        #  * Multiport S-Parameter Measurements of Linear Circuits With Open Ports
-        #           by Reimann et al. (only S <-> Z)
+        #  * Multiport S-Parameter Measurements of Linear Circuits With Open
+        #           Ports by Reimann et al. (only S <-> Z)
         #  * Agilent AN 154 - S-Parameter Design (S <-> T)
         #  * MATLAB S-parameter toolbox (Z, Y, H, G, ABCD, T)
         #           http://www.mathworks.com/matlabcentral/fileexchange/6080
@@ -377,10 +442,11 @@ class NPortMatrix(NPortMatrixBase):
 
     def submatrix(self, ports):
         """Keep only the parameters corresponding to the given ports,
-        discarding the others.
+        discarding the others
 
         :param ports: list of ports to keep
         :type ports: iterable
+        :rtype: :class:`NPortMatrix`
         
         """
         indices = [port - 1 for port in ports]
@@ -389,13 +455,17 @@ class NPortMatrix(NPortMatrixBase):
 
     def recombine(self, portsets):
         """Recombine ports, reducing the number of ports of this NPortMatrix.
-        This NPortMatrix has to be an impedance matrix.
+        This :class:`NPortMatrix` has to be an impedance matrix
         
-        `portsets` is a list of ints and tuples. An int specifies the number of
-        a port that needs to be kept as-is. If the int is negative, the port's
-        polarity will be reversed. A tuple specifies a pair of ports that are
-        to be recombined into one port. The second element of this tuple acts
-        as the ground reference to the first element.
+        :param portsets: an :class:`int` specifies the number of a port that
+                         needs to be kept as-is. If the :class:`int` is
+                         negative, the port's polarity will be reversed. A
+                         :class:`tuple` specifies a pair of ports that are to be
+                         recombined into a single port. The second element of
+                         this :class:`tuple` acts as the ground reference to the
+                         first element.
+        :type portsets: iterable of :class:`int`\s and :class:`tuple`\s
+        :rtype: :class:`NPortMatrix`
         
         >>> recombine([(1,3), (2,4), 5, -6]
         
@@ -432,7 +502,11 @@ class NPortMatrix(NPortMatrixBase):
         return NPortMatrix(result, self.type, self.z0)
         
     def ispassive(self):
-        """Check whether this n-port matrix is passive"""
+        """Check whether this n-port matrix is passive
+        
+        :rtype: :class:`bool`
+        
+        """
         if self.type != SCATTERING:
             return self.convert(SCATTERING).ispassive()
         else:
@@ -442,18 +516,45 @@ class NPortMatrix(NPortMatrixBase):
                 return True
 
     def isreciprocal(self):
-        """Check whether this n-port matrix is reciprocal"""
+        """Check whether this n-port matrix is reciprocal
+        
+        :rtype: :class:`bool`
+        
+        """
         raise NotImplementedError
 
     def issymmetrical(self):
-        """Check whether this n-port matrix is symmetrical"""
+        """Check whether this n-port matrix is symmetrical
+        
+        :rtype: :class:`bool`
+        
+        """
         raise NotImplementedError
 
 
 class TwoPortMatrix(NPortMatrix):
-    """Class representing a 2-port matrix (Z, Y, S, T, G, H or ABCD)"""
+    """Class representing a 2-port matrix (Z, Y, S, T, G, H or ABCD)
+    
+    :param matrix: matrix elements
+    :type matrix: 2 by 2 array
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`, :data:`H`
+                or :data:`ABCD`
+    :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+    :type z0: :class:`float`
+
+    """
     def convert(self, type, z0=None):
-        """Convert to another 2-port matrix representation"""
+        """Convert to another 2-port matrix representation
+        
+        :param type: new matrix type
+        :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`,
+                    :data:`H` or :data:`ABCD`
+        :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+        :type z0: :class:`float`
+        :rtype: :class:`NPortMatrix`
+
+        """
         # references:
         #  * http://qucs.sourceforge.net/tech/node98.html
         #           "Transformations of n-Port matrices"
@@ -609,7 +710,19 @@ class TwoPortMatrix(NPortMatrix):
 
 
 class NPort(NPortBase):
-    """Class representing an n-port across a list of frequencies"""
+    """Class representing an n-port across a list of frequencies
+    
+    :param freqs: list of frequency samples
+    :type freqs: :class:`list`
+    :param matrix: list of matrix elements
+    :type matrix: list of *n* by *n* arrays
+    :param type: matrix type
+    :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`, :data:`H`
+                or :data:`ABCD`
+    :param z0: normalizing impedance (only :data:`S`)
+    :type z0: :class:`float`
+
+    """
     def __new__(cls, freqs, matrices, type, z0=None):
         matrices = np.asarray(matrices, dtype=complex)
         obj = NPortBase.__new__(cls, freqs, matrices, type, z0)
@@ -617,25 +730,28 @@ class NPort(NPortBase):
             raise ValueError("the matrices should be two-dimensional")
         return obj
 
-    def __init__(self, freqs, matrices, type, z0=50):
-        """Initialize an instance, specifying the frequency samples, all
-        corresponsing matrices, the matrix type and the reference impedance
-
-        """
-        pass
-
     @property
     def ports(self):
-        """The number of ports of this NPort"""
+        """The number of ports of this :class:`NPort`
+        
+        :rtype: :class:`int`
+        
+        """
         return self[0].shape[0]
 
     def add(self, freq, matrix):
-        """Return an NPort with the specified frequency sample added
+        """Return an NPort with the specified frequency sample added.
 
-        If matrix is an NPortMatrix, its elements will be converted to this
-        NPort's type and characteristic impedance.
-        If matrix is a complex array, it is assumed the elements are in the
-        format of this NPort
+        :param freq: frequency at which to insert `matrix`
+        :type freq: :class:`float`
+        :param matrix: matrix to insert at `freq`
+        :type matrix: :class:`NPortMatrix` or a complex array
+        :rtype: :class:`NPort`
+
+        If matrix is an :class:`NPortMatrix`, its elements will be converted to
+        this :class:`NPort`'s type and characteristic impedance. If `matrix` is
+        a complex array, it is assumed the elements are in the format of this
+        :class:`NPort`.
 
         """
         if type(matrix) == NPortMatrix:
@@ -651,9 +767,9 @@ class NPort(NPortBase):
         and outports as the output ports.
         
         :param inports: the list of ports that make up the inputs of the 2n-port
-        :type inports: tuple or list
+        :type inports: :class:`tuple` or :class:`list`
         :param outports: the list of ports that make up the outputs
-        :type outports: tuple or list
+        :type outports: :class:`tuple` or :class:`list`
         :rtype: :class:`TwoNPort`
 
         """
@@ -666,7 +782,13 @@ class NPort(NPortBase):
                                  self.z0)
 
     def renormalize(self, z0):
-        """Renormalize the n-port parameters to `z0`"""
+        """Renormalize the n-port parameters to `z0`
+
+        :param z0: new normalizing impedance
+        :type z0: :class:`float`
+        :rtype: :class:`NPort`
+
+        """
         if self.type not in (S, T):
             raise TypeError("Only S and T matrices can be renormalized")
 
@@ -684,8 +806,11 @@ class NPort(NPortBase):
         """Convert to another n-port matrix representation
         
         :param type: n-port representation type to convert to
-        :type type: Z, Y or S
-        
+        :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`,
+                    :data:`H` or :data:`ABCD`
+        :param z0: normalizing impedance (only :data:`S` and :data:`T`)
+        :type z0: :class:`float`
+
         """
         converted = []
         for matrix in self:
@@ -694,8 +819,8 @@ class NPort(NPortBase):
         return NPort(self.freqs, converted, type, z0)
 
     def submatrix(self, ports):
-        """Keep only the parameters corresponding to the given ports,
-        discarding the others.
+        """Keep only the parameters corresponding to the given ports, discarding
+        the others
         
         :param ports: list of ports to keep
         :type ports: iterable
@@ -706,7 +831,12 @@ class NPort(NPortBase):
         return NPort(self.freqs, submatrices, self.type, self.z0)
 
     def invert(self):
-        """Return an NPort described by the inverse of this NPort's matrices"""
+        """Return an :class:`NPort` described by the inverse of this
+        :class:`NPort`'s matrices
+        
+        :rtype: :class:`NPort`
+
+        """
         # TODO: determine type of output
         inverted = []
         for matrix in self:
@@ -715,15 +845,18 @@ class NPort(NPortBase):
         return NPort(self.freqs, inverted, self.type, self.z0)
 
     def recombine(self, portsets):
-        """Recombine ports, reducing the number of ports of this NPort.
+        """Recombine ports, reducing the number of ports of this :class:`NPort`.
         
-        :param portsets: An int specifies the number of
-           a port that needs to be kept as-is. If the int is negative, the
-           port's polarity will be reversed. A tuple specifies a pair of ports
-           that are to be recombined into one port. The second element of this
-           tuple acts as the ground reference to the first element.
-        :type portsets: a list of ints and tuples
-        
+        :param portsets: an :class:`int` specifies the number of a port that
+                         needs to be kept as-is. If the :class:`int` is
+                         negative, the port's polarity will be reversed. A
+                         :class:`tuple` specifies a pair of ports that are to be
+                         recombined into a single port. The second element of
+                         this :class:`tuple` acts as the ground reference to the
+                         first element.
+        :type portsets: iterable of :class:`int`\s and :class:`tuple`\s
+        :rtype: :class:`NPort`
+
         >>> recombine([(1,3), (2,4), 5, -6]
         
         will generate a four-port where:
@@ -742,7 +875,11 @@ class NPort(NPortBase):
         return NPort(self.freqs, recombined, self.type, self.z0)
 
     def ispassive(self):
-        """Check whether this NPort is passive"""
+        """Check whether this :class:`NPort` is passive
+        
+        :rtype: :class:`bool`
+        
+        """
         for nportmatrix in self:
             if not NPortMatrix(nportmatrix, self.type, self.z0).ispassive():
                 return False
@@ -750,7 +887,14 @@ class NPort(NPortBase):
 
 
 def dot(arg1, arg2):
-    """Matrix multiplication for NPorts and TwoNPorts"""
+    """Matrix multiplication for :class:`NPort`s and :class:`TwoNPort`s
+    
+    :type left: :class:`NPort`, :class:`TwoNPort`, :class:`NPortMatrix`,
+                :class:`TwoNPortMatrix` or :class:`ndarray`
+    :type right: :class:`NPort`, :class:`TwoNPort`, :class:`NPortMatrix`,
+                 :class:`TwoNPortMatrix` or :class:`ndarray`
+    
+    """
     def merge_freqs(freqs1, freqs2):
         minf = max(freqs1[0], freqs2[0])
         maxf = min(freqs1[-1], freqs2[-1])
