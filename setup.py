@@ -25,15 +25,15 @@ version_file.close()
 setup(
     name='nport',
     version=version,
-    packages=['nport'],
+    packages=['nport', 'smith'],
     scripts=['nporttool'],
-    requires=['numpy','scipy'],
+    requires=['numpy', 'scipy'],
     test_suite='nose.collector',
     
     author="Brecht Machiels",
     author_email="brecht.machiels@esat.kuleuven.be",
     description="Python package for handling n-port data",
     license="GPL",
-    keywords="two-port 2n-port s-parameters touchstone citi deembedding",
+    keywords="two-port 2n-port s-parameters touchstone citi deembedding smith",
     url="https://github.com/bmachiel/python-nport",
 )
