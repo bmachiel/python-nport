@@ -10,7 +10,7 @@ For now, only two-conductor transmission lines are supported.
 Two-conductor transmission lines
 --------------------------------
 
-.. autoclass:: nport.tline.TransmissionLine
+.. autoclass:: TransmissionLine
     :members: gamma, z0, rpm, lpm, gpm, cpm
     :undoc-members:
 

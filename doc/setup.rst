@@ -1,7 +1,7 @@
 .. _setup:
 
-Getting nport
-=============
+Getting :class:`nport`
+======================
 
 Requirements
 ------------

@@ -135,10 +135,10 @@ class Kolding00(Deembedder):
         :type through: :class:`nport.NPort`
         :param alpha: compensation parameter to account for the imperfections
                       of the short standard when gaps become large
-        :type alpha: float
+        :type alpha: :class:`float`
         :param asymmetric: use the generalized algorithm that also handles
                            asymmetric test-fixtures (NOT VERIFIED!)
-        :type asymmetric: bool
+        :type asymmetric: :class:`bool`
 
         """
         self.alpha = alpha
