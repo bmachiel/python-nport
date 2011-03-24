@@ -24,7 +24,8 @@ class TransmissionLine(object):
         :type length: float
         
         """
-        assert twonport.ports == 2
+        if not isinstance(twonport, TwoNPort) or twonport.ports != 2:
+            raise TypeError
         self.twonport = twonport.convert(nport.TRANSMISSION)
         self.freqs = self.twonport.freqs
         self.length = length
