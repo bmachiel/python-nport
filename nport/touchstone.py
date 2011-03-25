@@ -15,6 +15,14 @@ keys[MAG_ANGLE] = ('mag', 'deg')
 keys[DB_ANGLE] = ('db', 'deg')
 
 
+class ParseError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return "{0}: {1}".format(__class__, self.message)
+
+
 def read(file_path, verbose=False):
     """
     Load the contents of a Touchstone file into an NPort
@@ -54,13 +62,6 @@ _re_empty   = re.compile(r"^\s*$")
 
 def _parse_option_line(file, verbose=False):
     """Parse and interpret the option line in the touchstone file"""
-    regex = {
-        'unit':      re.compile(r"(#|\s+)(?P<unit>G|M|K|)Hz(\s+|$)", re.I),
-        'parameter': re.compile(r"(#|\s+)(?P<parameter>S|Y|Z|H|G)(\s+|$)", re.I),
-        'format':    re.compile(r"(#|\s+)(?P<format>DB|MA|RI)(\s+|$)", re.I),
-        'reference': re.compile(r"(#|\s+)R\s+(?P<reference>\d+)(\s+|$)", re.I)
-    }
-    
     prefix = {
         '' : 1,
         'K': 1e3,
@@ -80,18 +81,23 @@ def _parse_option_line(file, verbose=False):
     while not line.startswith('#'):
         line = file.readline()
 
-    m = regex['unit'].search(line)
-    if m:
-        frequnit = prefix[m.group('unit').upper()]
-    m = regex['parameter'].search(line)
-    if m:
-        type = m.group('parameter').upper()
-    m = regex['format'].search(line)
-    if m:
-        format = m.group('format').upper()
-    m = regex['reference'].search(line)
-    if m:
-        z0 = float(m.group('reference'))
+    options = line[1:].upper().split()
+    
+    i = 0
+    while i < len(options):
+        option = options[i]
+        if option in ('GHZ', 'MHZ', 'KHZ', 'HZ'):
+            frequnit = prefix[option[:-2]]
+        elif option in ('DB', 'MA', 'RI'):
+            format = option
+        elif option in ('S', 'Y', 'Z', 'H', 'G'):
+            parameter = option
+        elif option == 'R':
+            i += 1
+            z0 = float(options[i])
+        else:
+            raise ParseError('unrecognized option: {0}'.format(option))
+        i += 1
            
     if verbose:
         print("  Frequency unit: %g Hz" % frequnit)
