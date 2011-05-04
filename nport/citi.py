@@ -83,6 +83,27 @@ def write(instance, file_path):
 #                   2010-01-28 Brecht Machiels
 #                               * made parsing more robust
 #                               * changed indentation from 3 to 4 spaces
+#
+#  The software was developed and is owned by ITS/NTIA, an agency
+#  of the Federal Government.  Pursuant to title 15 United States
+#  Code Section 105, works of Federal employees are not subject to
+#  copyright protection in the United States.  This software is
+#  provided by ITS as a service and is expressly provided "AS IS".
+#  NEITHER ITS NOR NTIA MAKES ANY WARRANTY OF ANY KIND, EXPRESS,
+#  IMPLIED OR STATUTORY, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+#  WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+#  NON-INFRINGEMENT AND DATA ACCURACY.  ITS/NTIA does warrant or
+#  make any representations regarding the use of the software or
+#  the results thereof, including but not limited to the
+#  correctness, accuracy, reliability or usefulness of the
+#  software.
+#
+#  This software is free software;  you can use, copy, modify and
+#  redistribute it upon your acceptance of these terms and
+#  conditions and upon your express agreement to provide
+#  appropriate acknowledgements of ITS/NTIA's ownership of and
+#  development of this software by keeping this exact text present
+#  in any copied or derivative works.
 
 import string, sys
 
