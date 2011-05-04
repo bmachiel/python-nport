@@ -225,6 +225,7 @@ class RLGCTransmissionLine(TransmissionLine):
         return unwrap_sqrt(self.z_backward / self.y_backward)
 
 
+
 class MulticonductorTransmissionLine(object):
     """Class representing a multiconductor transmission line. It calculates:
     
@@ -244,7 +245,7 @@ class MulticonductorTransmissionLine(object):
     and backward propagation, while for non-reciprocal lines they differ.
 
     """
-    def __init__(self, twonport, length, reciprocal=False):
+    def __init__(self, twonport, length, reciprocal=True):
         """
         :param twonport: 2n-port that represents a multiconductor transmission
                          line
@@ -384,13 +385,18 @@ class MulticonductorTransmissionLine(object):
             #   based on T0, Tl, W0, Wl ?
             #   np.max(self.modal_z0_forward - self.modal_z0_backward)
         else:
-            tmp = - np.sqrt( (diag_dm - diag_am)**2 + 4 * diag_bm *diag_cm )
-            expgaml = 2 * (diag_am * diag_dm - diag_bm * diag_cm) / (diag_dm + diag_am + tmp)
-            expgaml_backward = 2 * (diag_am * diag_dm - diag_bm * diag_cm) / (diag_dm + diag_am - tmp)
-            self.modal_gamma_forward = np.log(expgaml) / self.length
-            self.modal_gamma_backward = np.log(expgaml_backward) / self.length
-            self.modal_z0_forward = 2 * diag_bm / (diag_dm - diag_am - tmp)
-            self.modal_z0_backward = - 2 * diag_bm / (diag_dm - diag_am + tmp)
+            sum = (diag_am + diag_dm) / 2.0
+            ad_bc = diag_am * diag_dm - diag_bm * diag_cm
+           
+            delta = unwrap_sqrt(sum**2 - ad_bc)
+            exp_gl_forward = sum + delta
+            exp_gl_backward = sum - delta
+            
+            self.modal_gamma_forward = unwrap_log(exp_gl_forward) / self.length
+            self.modal_gamma_backward = - unwrap_log(exp_gl_backward) / self.length
+
+            self.modal_z0_forward = (exp_gl_forward - diag_dm) / diag_cm
+            self.modal_z0_backward = (diag_dm - exp_gl_backward) / diag_cm
 
         self.modal_y0_forward = 1.0 / self.modal_z0_forward
         self.modal_y0_backward = 1.0 / self.modal_z0_backward
@@ -406,9 +412,10 @@ class MulticonductorTransmissionLine(object):
             np.asarray([np.dot(np.dot(t0, np.diag(gam)), tlinv)
                         for t0, gam, tlinv
                         in zip(self.t0, self.modal_gamma_forward, self.tlinv)])
-        #~ self.natural_gamma_backward = \  # this is a guess
-            #~ np.asarray([np.dot(np.dot(tl, np.diag(gam)), t0inv)
-                #~ for tl, gam, t0inv in zip(self.tl, self.modal_gamma, self.t0inv)])
+#        self.natural_gamma_backward = \  # this is a guess
+#            np.asarray([np.dot(np.dot(tl, np.diag(gam)), t0inv)
+#                        for tl, gam, t0inv
+#                        in zip(self.tl, self.modal_gamma, self.t0inv)])
 
         self.modal_y0m_forward = np.asarray([np.diag(y0)
                                              for y0
@@ -423,8 +430,8 @@ class MulticonductorTransmissionLine(object):
                                               in zip(self.w0,
                                                      self.modal_y0m_forward,
                                                      self.tlinv)])
-        #~ self.natural_y0_backward = np.asarray([np.dot(np.dot(wl, y0), t0inv) # this is a guess
-            #~ for wl, y0, t0inv in zip(self.wl, self.modal_y0m_backward, self.t0inv)])
+#        self.natural_y0_backward = np.asarray([np.dot(np.dot(wl, y0), t0inv) # this is a guess
+#            for wl, y0, t0inv in zip(self.wl, self.modal_y0m_backward, self.t0inv)])
             # conversion to natural wave admittance matrices [FAR93] eq 1.57
         self.natural_z0_forward = np.asarray([np.linalg.inv(y0) 
                                               for y0
@@ -448,12 +455,13 @@ class MulticonductorTransmissionLine(object):
         self._cpm_forward = (self.ypm_forward.imag.T /
                              (2 * np.pi * self.freqs)).T
 
-        # gamma's should have positive betas (not done above so as not to ruin RLGC calculation)
+        # gamma's should have positive betas (not done above so as not to ruin
+        # RLGC calculation)
         self.modal_gamma_forward *= np.sign(self.modal_gamma_forward.imag)
         self.modal_gamma_backward *= np.sign(self.modal_gamma_backward.imag)
 
         self.modal_gamma = self.modal_gamma_forward
-
+        
     @property
     def gamma_forward(self):
         """Forward propagation constant"""
