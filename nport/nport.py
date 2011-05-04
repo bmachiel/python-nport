@@ -455,7 +455,6 @@ class NPortMatrix(NPortMatrixBase):
 
     def recombine(self, portsets):
         """Recombine ports, reducing the number of ports of this NPortMatrix.
-        This :class:`NPortMatrix` has to be an impedance matrix
         
         :param portsets: an :class:`int` specifies the number of a port that
                          needs to be kept as-is. If the :class:`int` is
@@ -477,30 +476,86 @@ class NPortMatrix(NPortMatrixBase):
         * port 4 is original port 6, but with reversed polarity
 
         """
-        assert self.type == IMPEDANCE
-        m = []
-        for i, ports in enumerate(portsets):
-            row = [0 for port in range(self.ports)]
-            try:
-                if isinstance(ports, tuple):
-                    assert len(ports) == 2
-                    row[ports[0] - 1] = 1
-                    row[ports[1] - 1] = -1
-                else:
-                    assert isinstance(ports, int)
-                    assert ports != 0
-                    if ports > 0:
-                        row[ports - 1] = 1
+        if self.type == IMPEDANCE:
+            m = []
+            for i, ports in enumerate(portsets):
+                row = [0 for port in range(self.ports)]
+                try:
+                    if isinstance(ports, tuple):
+                        assert len(ports) == 2
+                        row[ports[0] - 1] = 1
+                        row[ports[1] - 1] = -1
                     else:
-                        row[-ports - 1] = -1
-            except IndexError:
-                raise IndexError("specified port number is higher than number "
-                                 "of ports")
-            m.append(row)
-        m = np.matrix(m, dtype=float)
-        result = m * np.asarray(self) * m.T
-        return NPortMatrix(result, self.type, self.z0)
+                        assert isinstance(ports, int)
+                        assert ports != 0
+                        if ports > 0:
+                            row[ports - 1] = 1
+                        else:
+                            row[-ports - 1] = -1
+                except IndexError:
+                    raise IndexError("specified port number is higher than "
+                                     "number of ports")
+                m.append(row)
+            m = np.matrix(m, dtype=float)
+            result = m * np.asarray(self) * m.T
+            return self.__class__(result, self.type, self.z0)
+        else:
+            z_recombined = self.convert(IMPEDANCE).recombine(portsets)
+            return z_recombined.convert(self.type)
+
+    def shunt(self, portsets):
+        """Connect ports together, reducing the number of ports of this
+        :class:`NPortMatrix`.
         
+        :param portsets: an :class:`int` specifies the number of a port that
+                         needs to be kept as-is. A :class:`tuple` specifies a
+                         set of ports that are to be connected together.
+        :type portsets: iterable of :class:`int`\s and :class:`tuple`\s
+        :rtype: :class:`NPortMatrix`
+
+        >>> shunt([1, (2, 3), (4, 5, 6)]
+        
+        will generate a three-port where:
+        
+        * port 1 is original port 1
+        * port 2 is original port 2 and 3 connected together
+        * port 3 is original ports 4, 5 and 6 connected together
+
+        """
+        if self.type == ADMITTANCE:
+            # columns
+            tmp = np.zeros((self.ports, len(portsets)), dtype=complex)
+            for i, ports in enumerate(portsets):
+                try:
+                    if isinstance(ports, tuple):
+                        ports = [port - 1 for port in ports]
+                        tmp[:, i] = np.sum(self[:, ports], 1)
+                    else:
+                        assert isinstance(ports, int)
+                        assert ports > 0
+                        tmp[:, i] = self[:, ports - 1]
+                except IndexError:
+                    raise IndexError("specified port number is higher than "
+                                     "number of ports")
+            # rows
+            result = np.zeros((len(portsets), len(portsets)), dtype=complex)
+            for i, ports in enumerate(portsets):
+                try:
+                    if isinstance(ports, tuple):
+                        ports = [port - 1 for port in ports]
+                        result[i, :] = np.sum(tmp[ports, :], 0)
+                    else:
+                        assert isinstance(ports, int)
+                        assert ports > 0
+                        result[i, :] = tmp[ports - 1, :]
+                except IndexError:
+                    raise IndexError("specified port number is higher than "
+                                     "number of ports")
+            return self.__class__(result, self.type, self.z0)
+        else:
+            y_shunted = self.convert(ADMITTANCE).shunt(portsets)
+            return y_shunted.convert(self.type)
+
     def ispassive(self):
         """Check whether this n-port matrix is passive
         
@@ -870,9 +925,35 @@ class NPort(NPortBase):
         recombined = []
         for i, matrix in enumerate(self):
             nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            recomb = nportmatrix.convert(IMPEDANCE).recombine(portsets)
-            recombined.append(recomb.convert(self.type))
-        return NPort(self.freqs, recombined, self.type, self.z0)
+            recomb = nportmatrix.recombine(portsets)
+            recombined.append(recomb)
+        return self.__class__(self.freqs, recombined, self.type, self.z0)
+
+    def shunt(self, portsets):
+        """Connect ports together, reducing the number of ports of this
+        :class:`NPort`.
+        
+        :param portsets: an :class:`int` specifies the number of a port that
+                         needs to be kept as-is. A :class:`tuple` specifies a
+                         set of ports that are to be connected together.
+        :type portsets: iterable of :class:`int`\s and :class:`tuple`\s
+        :rtype: :class:`NPort`
+
+        >>> shunt([1, (2, 3), (4, 5, 6)]
+        
+        will generate a three-port where:
+        
+        * port 1 is original port 1
+        * port 2 is original port 2 and 3 connected together
+        * port 3 is original ports 4, 5 and 6 connected together
+
+        """
+        shunted = []
+        for i, matrix in enumerate(self):
+            nportmatrix = NPortMatrix(matrix, self.type, self.z0)
+            shunt = nportmatrix.shunt(portsets)
+            shunted.append(shunt)
+        return self.__class__(self.freqs, shunted, self.type, self.z0)
 
     def ispassive(self):
         """Check whether this :class:`NPort` is passive
