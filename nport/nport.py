@@ -293,7 +293,7 @@ class NPortMatrix(NPortMatrixBase):
             raise ValueError("the matrix should be two-dimensional")
         if obj.shape[0] != obj.shape[1]:
             raise ValueError("the matrix should be square")
-        if matrix.shape[0] == 2:
+        if obj.shape[0] == 2:
             obj.__class__ = TwoPortMatrix
         return obj
 
@@ -763,6 +763,80 @@ class TwoPortMatrix(NPortMatrix):
             nportmatrix = super(self.__class__, self)
             return nportmatrix.twonportmatrix().convert(type, z0).nportmatrix()
 
+    @property
+    def delta(self):
+        return np.linalg.det(self)
+
+    def stability_circle_source(self):
+        if self.type != SCATTERING:
+            return self.convert(SCATTERING).stability_circle_source()
+        else:
+            s11 = self[0, 0]
+            s12 = self[0, 1]
+            s21 = self[1, 0]
+            s22 = self[1, 1]
+            delta = self.delta
+            denom = np.abs(s11)**2 - np.abs(delta)**2
+            center = np.conj(s11 - delta * np.conj(s22)) / denom
+            radius = np.abs(s12 * s21 / denom)
+            return center, radius
+        
+    def stability_circle_load(self):
+        if self.type != SCATTERING:
+            return self.convert(SCATTERING).stability_circle_source()
+        else:
+            s11 = self[0, 0]
+            s12 = self[0, 1]
+            s21 = self[1, 0]
+            s22 = self[1, 1]
+            delta = self.delta
+            denom = np.abs(s22)**2 - np.abs(delta)**2
+            center = np.conj(s22 - delta * np.conj(s11)) / denom
+            radius = np.abs(s12 * s21 / denom)
+            return center, radius
+
+    def stability_k(self):
+        """Returns the Rollet stability factor K and Delta
+        
+        :rtype: tuple
+        
+        """
+        if self.type != SCATTERING:
+            return self.convert(SCATTERING).stability_k()
+        else:
+            s11 = self[0, 0]
+            s12 = self[0, 1]
+            s21 = self[1, 0]
+            s22 = self[1, 1]
+            delta = self.delta
+            k = ((1 - np.abs(s11)**2 - np.abs(s22)**2 + np.abs(delta)**2) /
+                 (2 * np.abs(s12 * s21)))
+            return k, delta
+
+    def stability_mu(self):
+        """Returns the mu stability factor
+        
+        :rtype: :class:`float`
+        
+        """
+        if self.type != SCATTERING:
+            return self.convert(SCATTERING).stability_k()
+        else:
+            s11 = self[0, 0]
+            s12 = self[0, 1]
+            s21 = self[1, 0]
+            s22 = self[1, 1]
+            delta = self.delta
+            return (1 - np.abs(s11)**2) / (np.abs(s22 - delta * np.conj(s11)) +
+                                           np.abs(s12 * s21))
+
+    def isstable_k(self):
+        k, delta = self.stability_k()
+        return k > 1 and np.abs(delta) < 1            
+    
+    def isstable_mu(self):
+        return self.stability_mu() > 1
+
 
 class NPort(NPortBase):
     """Class representing an n-port across a list of frequencies
@@ -783,6 +857,8 @@ class NPort(NPortBase):
         obj = NPortBase.__new__(cls, freqs, matrices, type, z0)
         if len(obj[0].shape) != 2:
             raise ValueError("the matrices should be two-dimensional")
+        if obj[0].shape[0] == 2:
+            obj.__class__ = TwoPort
         return obj
 
     @property
@@ -963,6 +1039,47 @@ class NPort(NPortBase):
         """
         for nportmatrix in self:
             if not NPortMatrix(nportmatrix, self.type, self.z0).ispassive():
+                return False
+        return True
+
+
+class TwoPort(NPort):
+    def stability_circle_source(self):
+        center = np.zeros(len(self), complex)
+        radius = np.zeros(len(self), complex)
+        for i, twoportmatrix in enumerate(self):
+            center[i], radius[i] = twoportmatrix.stability_circle_source()
+        return center, radius
+
+    def stability_circle_load(self):
+        center = np.zeros(len(self), complex)
+        radius = np.zeros(len(self), complex)
+        for i, twoportmatrix in enumerate(self):
+            center[i], radius[i] = twoportmatrix.stability_circle_load()
+        return center, radius
+
+    def stability_k(self):
+        k = np.zeros(len(self), complex)
+        delta = np.zeros(len(self), complex)
+        for i, twoportmatrix in enumerate(self):
+            k[i], delta[i] = twoportmatrix.stability_k()
+        return k, delta
+
+    def stability_mu(self):
+        mu = np.zeros_like(self.freqs)
+        for i, twoportmatrix in enumerate(self):
+            mu[i] = twoportmatrix.stability_mu()
+        return mu
+
+    def isstable_k(self):
+        for twoportmatrix in self:
+            if not TwoPort(twoportmatrix, self.type, self.z0).isstable_k():
+                return False
+        return True
+    
+    def isstable_mu(self):
+        for twoportmatrix in self:
+            if not TwoPort(twoportmatrix, self.type, self.z0).isstable_mu():
                 return False
         return True
 
