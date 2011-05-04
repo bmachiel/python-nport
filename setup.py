@@ -28,6 +28,7 @@ setup(
     packages=['nport', 'smith'],
     scripts=['nporttool'],
     requires=['numpy', 'scipy'],
+    provides=['nport', 'smith'],
     test_suite='nose.collector',
     
     author="Brecht Machiels",
