@@ -37,4 +37,14 @@ setup(
     license="GPL",
     keywords="two-port 2n-port s-parameters touchstone citi deembedding smith",
     url="https://github.com/bmachiel/python-nport",
+    classifiers = [
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)', 
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ]
 )
