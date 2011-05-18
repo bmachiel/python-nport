@@ -1,5 +1,11 @@
 #!/bin/env python
 
+"""
+
+setuptools setup script for nport
+
+"""
+
 from setuptools import setup
 from subprocess import Popen, PIPE
 
@@ -12,8 +18,9 @@ try:
     p.stderr.close()
     line = p.stdout.readlines()[0]
     version = line.strip()[1:]
-except:
-    print("A problem occured while trying to run git. "
+except OSError as e:
+    print("A problem occured while trying to run git: \n" +
+          e.strerror + "\n" +
           "Version information is unavailable!")
     version = 'unknown'
 
@@ -34,9 +41,9 @@ setup(
     author="Brecht Machiels",
     author_email="brecht.machiels@esat.kuleuven.be",
     description="Python package for handling n-port data",
+    url="https://github.com/bmachiel/python-nport",
     license="GPL",
     keywords="two-port 2n-port s-parameters touchstone citi deembedding smith",
-    url="https://github.com/bmachiel/python-nport",
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -44,7 +51,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)', 
+        'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ]
 )
