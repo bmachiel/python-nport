@@ -1,12 +1,15 @@
 from __future__ import division
 
 import numpy as np
-import nport
 
-from nport import Z, Y, S, T, ABCD
+from .base import Z, Y, S, T, ABCD
+from .base import IMPEDANCE, ADMITTANCE, SCATTERING, SCATTERING_TRANSFER
+from .base import HYBRID, INVERSE_HYBRID, TRANSMISSION 
+from .base import NPortMatrixBase, NPortBase
+from .nport import NPortMatrix, NPort
 
 
-class TwoNPortMatrix(nport.NPortMatrixBase):
+class TwoNPortMatrix(NPortMatrixBase):
     """Class representing a 2n-port matrix (Z, Y, S, T or ABCD)
 
     :param freqs: list of frequency samples
@@ -22,7 +25,7 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
     # See also "block matrices" in the Matrix Cookbook
     def __new__(cls, matrix, type, z0=None):
         matrix = np.asarray(matrix, dtype=complex)
-        obj = nport.NPortMatrixBase.__new__(cls, matrix, type, z0)
+        obj = NPortMatrixBase.__new__(cls, matrix, type, z0)
         if len(obj.shape) != 4:
             raise ValueError("the matrix should be four-dimensional")
         if obj.shape[0] != 2 or obj.shape[0] != obj.shape[1]:
@@ -48,7 +51,7 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
         """
         matrix = np.vstack((np.hstack((self[0,0], self[0,1])),
             np.hstack((self[1,0], self[1,1]))))
-        return nport.NPortMatrix(matrix, self.type, self.z0)
+        return NPortMatrix(matrix, self.type, self.z0)
 
     def renormalize(self, z0):
         """Renormalize the 2n-port parameters to `z0`
@@ -241,14 +244,14 @@ class TwoNPortMatrix(nport.NPortMatrixBase):
         else:
             nportmatrix = self.nportmatrix()
             # catch infinite recursion for TwoPortMatrix
-            nportmatrix.__class__ = nport.NPortMatrix
+            nportmatrix.__class__ = NPortMatrix
             result = nportmatrix.convert(type, z0)
             return result.twonportmatrix()
 
         return result
 
 
-class TwoNPort(nport.NPortBase):
+class TwoNPort(NPortBase):
     """Class representing a 2n-port across a list of frequencies
 
     :param matrices: list of matrix elements
@@ -260,9 +263,11 @@ class TwoNPort(nport.NPortBase):
     :type z0: :class:`float`
 
     """
+    matrix_cls = TwoNPortMatrix
+
     def __new__(cls, freqs, matrices, type, z0=None):
         matrices = np.asarray(matrices, dtype=complex)
-        obj = nport.NPortBase.__new__(cls, freqs, matrices, type, z0)
+        obj = NPortBase.__new__(cls, freqs, matrices, type, z0)
         if len(obj[0].shape) != 4:
             raise ValueError("the matrices should be four-dimensional")
         if obj[0].shape[0] != 2 or obj[0].shape[0] != obj[0].shape[1]:
@@ -320,7 +325,7 @@ class TwoNPort(nport.NPortBase):
         for matrix in self:
             twonportmatrix = TwoNPortMatrix(matrix, self.type, self.z0)
             nportmatrices.append(twonportmatrix.nportmatrix())
-        return nport.NPort(self.freqs, nportmatrices, self.type, self.z0)
+        return NPort(self.freqs, nportmatrices, self.type, self.z0)
 
     def renormalize(self, z0):
         """Renormalize the 2n-port parameters to `z0`
