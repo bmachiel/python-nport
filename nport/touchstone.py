@@ -12,7 +12,7 @@ DB_ANGLE = 'DB'
 keys = {}
 keys[REAL_IMAG] = ('real', 'imag')
 keys[MAG_ANGLE] = ('mag', 'deg')
-keys[DB_ANGLE] = ('db', 'deg')
+keys[DB_ANGLE] = ('db20', 'deg')
 
 
 class ParseError(Exception):
@@ -210,7 +210,7 @@ def write(instance, file_path, format=REAL_IMAG):
             elif format == MAG_ANGLE:
                 sample += " %g %g" % (parameter.mag(element), parameter.deg(element))
             elif format == DB_ANGLE:
-                sample += " %g %g" % (parameter.db(element), parameter.deg(element))
+                sample += " %g %g" % (parameter.db20(element), parameter.deg(element))
             else:
                 raise ValueError("unknown format specified")
         file.write(sample + "\n")
