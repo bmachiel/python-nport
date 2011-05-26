@@ -78,6 +78,17 @@ class NPortMatrixBase(np.ndarray):
         self.type = getattr(obj, 'type', None)
         self.z0 = getattr(obj, 'z0', None)
 
+    def __reduce__(self):
+        object_state = list(np.ndarray.__reduce__(self))
+        subclass_state = (self.type, self.z0, )
+        object_state[2] = (object_state[2], subclass_state)
+        return tuple(object_state)
+    
+    def __setstate__(self,state):
+        nd_state, own_state = state
+        np.ndarray.__setstate__(self, nd_state)
+        self.type, self.z0 = own_state
+
     @property
     def ports(self):
         """The number of ports of this :class:`NPortMatrixBase`
@@ -188,6 +199,17 @@ class NPortBase(NPortMatrixBase):
                                    self.z0)
         else:
             return np.asarray(self).__getitem__(arg)
+
+    def __reduce__(self):
+        object_state = list(super(NPortBase, self).__reduce__())
+        subclass_state = (self.freqs, )
+        object_state[2] = (object_state[2], subclass_state)
+        return tuple(object_state)
+    
+    def __setstate__(self,state):
+        super_state, own_state = state
+        super(NPortBase, self).__setstate__(super_state)
+        self.freqs, = own_state
 
     #~ def __repr__(self):
         #~ return "freqs: " + repr(self.freqs) + "\n" + NPortMatrixBase.__repr__(self)
