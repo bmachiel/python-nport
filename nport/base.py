@@ -31,7 +31,7 @@ class NPortMatrixBase(np.ndarray):
     :param type: matrix type
     :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`,
                 :data:`H` or :data:`ABCD`
-    :param z0: normalizing impedance (only S)
+    :param z0: normalizing impedance (only :class:`S` and :class:`T`)
     :type z0: :class:`float`
 
     """
@@ -221,7 +221,9 @@ class NPortBase(NPortMatrixBase):
         """Return the parameter as specified by the indices `port1` and `port2`
         as an ndarray
         
+        :param port1: first index
         :type port1: :class:`int`
+        :param port2: second index
         :type port2: :class:`int`
         :returns: parameter at indices `port1` and `port2`
         :rtype: :class:`ndarray`

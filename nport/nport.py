@@ -19,7 +19,7 @@ class NPortMatrix(NPortMatrixBase):
     :param type: matrix type
     :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`, :data:`H`
                 or :data:`ABCD`
-    :param z0: normalizing impedance (only :class:`S`)
+    :param z0: normalizing impedance (only :class:`S` and :class:`T`)
     :type z0: :class:`float`
     
     """
@@ -179,7 +179,9 @@ class NPortMatrix(NPortMatrixBase):
 
     def submatrix(self, ports):
         """Keep only the parameters corresponding to the given ports,
-        discarding the others
+        discarding the others. For a Z-matrix and a Y-matrix this corresponds to
+        terminating the discarded ports in an open or short circuit
+        respectively.
 
         :param ports: list of ports to keep
         :type ports: iterable
@@ -334,7 +336,7 @@ class NPort(NPortBase):
     :param type: matrix type
     :type type: :data:`Z`, :data:`Y`, :data:`S`, :data:`T`, :data:`G`, :data:`H`
                 or :data:`ABCD`
-    :param z0: normalizing impedance (only :data:`S`)
+    :param z0: normalizing impedance (only :class:`S` and :class:`T`)
     :type z0: :class:`float`
 
     """
@@ -382,8 +384,8 @@ class NPort(NPortBase):
         return self.__class__(freqs, matrices, self.type, self.z0)
 
     def twonport(self, inports=None, outports=None):
-        """Convert this NPort to a TwoNPort using inports as the input ports
-        and outports as the output ports.
+        """Convert this NPort to a TwoNPort using `inports` as the input ports
+        and `outports` as the output ports.
         
         :param inports: the list of ports that make up the inputs of the 2n-port
         :type inports: :class:`tuple` or :class:`list`
@@ -439,7 +441,9 @@ class NPort(NPortBase):
 
     def submatrix(self, ports):
         """Keep only the parameters corresponding to the given ports, discarding
-        the others
+        the others. For a Z-matrix and a Y-matrix this corresponds to
+        terminating the discarded ports in an open or short circuit
+        respectively.
         
         :param ports: list of ports to keep
         :type ports: iterable
