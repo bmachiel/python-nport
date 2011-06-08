@@ -7,6 +7,7 @@ from .base import Z, Y, S, T, H, G, ABCD
 from .base import IMPEDANCE, ADMITTANCE, SCATTERING, SCATTERING_TRANSFER
 from .base import HYBRID, INVERSE_HYBRID, TRANSMISSION 
 from .base import NPortMatrixBase, NPortBase
+from .parameter import rad
 
 
 class NPortMatrix(NPortMatrixBase):
@@ -528,6 +529,25 @@ class NPort(NPortBase):
             if not NPortMatrix(nportmatrix, self.type, self.z0).ispassive():
                 return False
         return True
+
+    def group_delay(self, port1, port2):
+        """Return the group delay of the parameter as specified by the indices
+        `port1` and `port2`
+        
+        :param port1: index of input port
+        :type port1: :class:`int`
+        :param port2: index of output port
+        :type port2: :class:`int`
+        :returns: group delay of parameter at indices `port1` and `port2`
+        :rtype: :class:`ndarray`
+        
+        """
+        if self.type not in (S, ):
+            raise TypeError("Group delay only makes sense for S-parameters (?)")
+        phase = np.unwrap(rad(self.get_parameter(port1, port2)))
+        dphase = np.gradient(phase)
+        dfreq = np.gradient(self.freqs)
+        return - dphase / (2 * np.pi * dfreq)
 
 
 def dot(arg1, arg2):
