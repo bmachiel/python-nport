@@ -241,7 +241,7 @@ class TwoPortMatrix(NPortMatrix):
         
         """
         if self.type != SCATTERING:
-            return self.convert(SCATTERING).stability_k()
+            return self.convert(SCATTERING).stability_mu()
         else:
             s11 = self[0, 0]
             s12 = self[0, 1]
