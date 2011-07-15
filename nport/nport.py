@@ -4,8 +4,7 @@ from __future__ import division
 import numpy as np
 
 from .base import Z, Y, S, T, H, G, ABCD
-from .base import IMPEDANCE, ADMITTANCE, SCATTERING, SCATTERING_TRANSFER
-from .base import HYBRID, INVERSE_HYBRID, TRANSMISSION 
+from .base import IMPEDANCE, ADMITTANCE, SCATTERING
 from .base import NPortMatrixBase, NPortBase
 from .parameter import rad
 
@@ -491,7 +490,7 @@ class NPort(NPortBase):
 
         """
         recombined = []
-        for i, matrix in enumerate(self):
+        for matrix in self:
             nportmatrix = NPortMatrix(matrix, self.type, self.z0)
             recomb = nportmatrix.recombine(portsets)
             recombined.append(recomb)
@@ -517,7 +516,7 @@ class NPort(NPortBase):
 
         """
         shunted = []
-        for i, matrix in enumerate(self):
+        for matrix in self:
             nportmatrix = NPortMatrix(matrix, self.type, self.z0)
             shunt = nportmatrix.shunt(portsets)
             shunted.append(shunt)
@@ -575,7 +574,7 @@ def dot(arg1, arg2):
             result_freqs = merge_freqs(arg1.freqs, arg2.freqs)
             arg1_matrices = arg1.at(result_freqs)
             arg2_matrices = arg2.at(result_freqs)
-            result_matrices = np.asarray([np.dot(a, b) for (a,b) in
+            result_matrices = np.asarray([np.dot(a, b) for (a, b) in
                 zip(arg1_matrices, arg2_matrices)])
         else:
             result_freqs = arg1.freqs
@@ -585,16 +584,16 @@ def dot(arg1, arg2):
     elif type(arg1) == TwoNPort:
         if type(arg2) == TwoNPort:
             def twonport_dot(l, r):
-                a = np.dot(l[0,0], r[0,0]) + np.dot(l[0,1], r[1,0])
-                b = np.dot(l[0,0], r[0,1]) + np.dot(l[0,1], r[1,1])
-                c = np.dot(l[1,0], r[0,0]) + np.dot(l[1,1], r[1,0])
-                d = np.dot(l[1,0], r[0,1]) + np.dot(l[1,1], r[1,1])
+                a = np.dot(l[0, 0], r[0, 0]) + np.dot(l[0, 1], r[1, 0])
+                b = np.dot(l[0, 0], r[0, 1]) + np.dot(l[0, 1], r[1, 1])
+                c = np.dot(l[1, 0], r[0, 0]) + np.dot(l[1, 1], r[1, 0])
+                d = np.dot(l[1, 0], r[0, 1]) + np.dot(l[1, 1], r[1, 1])
                 return np.asarray([[a, b], [c, d]])
             
             result_freqs = merge_freqs(arg1.freqs, arg2.freqs)
             arg1_matrices = arg1.at(result_freqs)
             arg2_matrices = arg2.at(result_freqs)
-            result_matrices = np.asarray([twonport_dot(a, b) for (a,b) in
+            result_matrices = np.asarray([twonport_dot(a, b) for (a, b) in
                 zip(arg1_matrices, arg2_matrices)])
         else:
             raise NotImplementedError
@@ -603,7 +602,7 @@ def dot(arg1, arg2):
     elif type(arg2) == NPort:
         raise NotImplementedError
     else:
-        np.dot(arg1, arg2)
+        return np.dot(arg1, arg2)
 
 
 from .twoport import TwoPortMatrix, TwoPort

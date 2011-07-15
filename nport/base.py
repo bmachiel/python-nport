@@ -211,12 +211,6 @@ class NPortBase(NPortMatrixBase):
         super(NPortBase, self).__setstate__(super_state)
         self.freqs, = own_state
 
-    #~ def __repr__(self):
-        #~ return "freqs: " + repr(self.freqs) + "\n" + NPortMatrixBase.__repr__(self)
-
-    #~ def __str__(self):
-        #~ return self.__repr__()
-
     def get_parameter(self, port1, port2):
         """Return the parameter as specified by the indices `port1` and `port2`
         as an ndarray
