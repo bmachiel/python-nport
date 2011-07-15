@@ -193,12 +193,15 @@ class NPortBase(NPortMatrixBase):
         super(NPortBase, self).__array_finalize__(obj)
         self.freqs = getattr(obj, 'freqs', None)
 
-    def __getitem__(self, arg):
-        if type(arg) == int:
-            return self.matrix_cls(np.asarray(self).__getitem__(arg), self.type,
-                                   self.z0)
+    def __getitem__(self, index):
+        if type(index) == int:
+            return self.matrix_cls(np.asarray(self)[index], self.type, self.z0)
         else:
-            return np.asarray(self).__getitem__(arg)
+            return np.asarray(self).__getitem__(index)
+
+    def __getslice__(self, start, end):
+        return self.__class__(self.freqs[start:end],
+                              np.asarray(self)[start:end], self.type, self.z0)
 
     def __reduce__(self):
         object_state = list(super(NPortBase, self).__reduce__())
