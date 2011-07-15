@@ -97,7 +97,21 @@ class NPortMatrixBase(np.ndarray):
         
         """
         raise NotImplementedError
-    
+
+    def get_parameter(self, port1, port2):
+        """Return the parameter as specified by the indices `port1` and `port2`
+        as an ndarray
+        
+        :param port1: first index
+        :type port1: :class:`int`
+        :param port2: second index
+        :type port2: :class:`int`
+        :returns: parameter at indices `port1` and `port2`
+        :rtype: :class:`complex`
+        
+        """
+        return self[port1 - 1, port2 - 1]
+
     def convert_z0test(self, type, z0):
         """Check supplied `z0` for conversion and set default value depending on
         the type
@@ -231,6 +245,13 @@ class NPortBase(NPortMatrixBase):
     def get_element(self, port1, port2):
         """Return the submatrices made up of the element as specified by the
         indices `port1` and `port2`
+        
+        :param port1: first index
+        :type port1: :class:`int`
+        :param port2: second index
+        :type port2: :class:`int`
+        :returns: submatrices at indices `port1` and `port2`
+        :rtype: :class:`ndarray`
         
         """
         subclass = type(self)
