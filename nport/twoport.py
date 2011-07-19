@@ -35,8 +35,6 @@ class TwoPortMatrix(NPortMatrix):
         #  * http://qucs.sourceforge.net/tech/node98.html
         #           "Transformations of n-Port matrices"
         z0 = self.convert_z0test(type, z0)
-        idty = np.identity(len(self), dtype=complex)
-        invert = np.linalg.inv
 
         if type not in (Z, Y, S, T, H, G, ABCD):
             raise TypeError("Unknown 2-port parameter type")
@@ -251,12 +249,47 @@ class TwoPortMatrix(NPortMatrix):
             return (1 - np.abs(s11)**2) / (np.abs(s22 - delta * np.conj(s11)) +
                                            np.abs(s12 * s21))
 
-    def isstable_k(self):
+
+    def conditional_stability_mu(self, r1, r2):
+        """Returns the conditional stability factor mu as defined in
+        
+        "Discussion and new proofs of the conditional stability criteria for 
+        multidevice microwave amplifiers" by M. Balsi, G. Scotti, P. Tommasino
+        and A. Trifiletti in "IEE Proceedings - Microwaves, Antennas and 
+        Propagation", vol. 153, no. 2, pp. 177-181, 2006
+
+        :param r1: maximum allowed value for the absolute value of the input
+                   reflection coefficient (0 < r1 <= 1)
+        :type r1: :class:`float`
+        :param r2: maximum allowed value for the absolute value of the input
+                   reflection coefficient (0 < r2 <= 1)
+        :type r2: :class:`float`
+        :rtype: :class:`float`
+        
+        """
+        if self.type != SCATTERING:
+            return self.convert(SCATTERING).stability_mu()
+        else:
+            s11 = self[0, 0]
+            s12 = self[0, 1]
+            s21 = self[1, 0]
+            s22 = self[1, 1]
+            delta = self.delta
+            nom = 1 - (np.abs(s22) * r2)**2
+            denom = (np.abs(s11 - np.conj(s22) * delta * r2**2) +  
+                     np.abs(s12 * s21) * r2) * r1
+            return nom / denom
+
+
+    def is_stable_k(self):
         k, delta = self.stability_k()
         return k > 1 and np.abs(delta) < 1            
     
-    def isstable_mu(self):
+    def is_stable_mu(self):
         return self.stability_mu() > 1
+
+    def is_conditionally_stable_mu(self, r1, r2):
+        return self.conditional_stability_mu(r1, r2) > 1
 
 
 class TwoPort(NPort):
@@ -289,14 +322,27 @@ class TwoPort(NPort):
             mu[i] = twoportmatrix.stability_mu()
         return mu
 
-    def isstable_k(self):
+    def conditional_stability_mu(self, r1, r2):
+        mu = np.zeros_like(self.freqs)
+        for i, twoportmatrix in enumerate(self):
+            mu[i] = twoportmatrix.conditional_stability_mu(r1, r2)
+        return mu
+
+    def is_stable_k(self):
         for twoportmatrix in self:
-            if not TwoPort(twoportmatrix, self.type, self.z0).isstable_k():
+            if not TwoPort(twoportmatrix, self.type, self.z0).is_stable_k():
                 return False
         return True
     
-    def isstable_mu(self):
+    def is_stable_mu(self):
         for twoportmatrix in self:
-            if not TwoPort(twoportmatrix, self.type, self.z0).isstable_mu():
+            if not TwoPort(twoportmatrix, self.type, self.z0).is_stable_mu():
+                return False
+        return True
+
+    def is_conditionally_stable_mu(self, r1, r2):
+        for twoportmatrix in self:
+            if not TwoPort(twoportmatrix, self.type,
+                           self.z0).is_conditionally_stable_mu(r1, r2):
                 return False
         return True
