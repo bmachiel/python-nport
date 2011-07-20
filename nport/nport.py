@@ -294,7 +294,7 @@ class NPortMatrix(NPortMatrixBase):
             y_shunted = self.convert(ADMITTANCE).shunt(portsets)
             return y_shunted.convert(self.type)
 
-    def ispassive(self):
+    def is_passive(self):
         """Check whether this n-port matrix is passive
         
         :rtype: :class:`bool`
@@ -308,7 +308,7 @@ class NPortMatrix(NPortMatrixBase):
             else:
                 return True
 
-    def isreciprocal(self):
+    def is_reciprocal(self):
         """Check whether this n-port matrix is reciprocal
         
         :rtype: :class:`bool`
@@ -316,7 +316,7 @@ class NPortMatrix(NPortMatrixBase):
         """
         raise NotImplementedError
 
-    def issymmetrical(self):
+    def is_symmetrical(self):
         """Check whether this n-port matrix is symmetrical
         
         :rtype: :class:`bool`
@@ -522,7 +522,7 @@ class NPort(NPortBase):
             shunted.append(shunt)
         return self.__class__(self.freqs, shunted, self.type, self.z0)
 
-    def ispassive(self):
+    def is_passive(self):
         """Check whether this :class:`NPort` is passive
         
         :rtype: :class:`bool`
