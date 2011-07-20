@@ -182,55 +182,13 @@ class TwoPortMatrix(NPortMatrix):
             nportmatrix = super(TwoPortMatrix, self)
             return nportmatrix.twonportmatrix().convert(type, z0).nportmatrix()
 
-    @property
-    def delta(self):
-        return np.linalg.det(self)
-
-    def stability_circle_source(self):
-        if self.type != SCATTERING:
-            return self.convert(SCATTERING).stability_circle_source()
-        else:
-            s11 = self[0, 0]
-            s12 = self[0, 1]
-            s21 = self[1, 0]
-            s22 = self[1, 1]
-            delta = self.delta
-            denom = np.abs(s11)**2 - np.abs(delta)**2
-            center = np.conj(s11 - delta * np.conj(s22)) / denom
-            radius = np.abs(s12 * s21 / denom)
-            return center, radius
-        
-    def stability_circle_load(self):
-        if self.type != SCATTERING:
-            return self.convert(SCATTERING).stability_circle_source()
-        else:
-            s11 = self[0, 0]
-            s12 = self[0, 1]
-            s21 = self[1, 0]
-            s22 = self[1, 1]
-            delta = self.delta
-            denom = np.abs(s22)**2 - np.abs(delta)**2
-            center = np.conj(s22 - delta * np.conj(s11)) / denom
-            radius = np.abs(s12 * s21 / denom)
-            return center, radius
-
     def stability_k(self):
         """Returns the Rollet stability factor K and Delta
         
         :rtype: tuple
         
         """
-        if self.type != SCATTERING:
-            return self.convert(SCATTERING).stability_k()
-        else:
-            s11 = self[0, 0]
-            s12 = self[0, 1]
-            s21 = self[1, 0]
-            s22 = self[1, 1]
-            delta = self.delta
-            k = ((1 - np.abs(s11)**2 - np.abs(s22)**2 + np.abs(delta)**2) /
-                 (2 * np.abs(s12 * s21)))
-            return k, delta
+        return stability_k(self)
 
     def stability_mu(self):
         """Returns the mu stability factor
@@ -238,17 +196,7 @@ class TwoPortMatrix(NPortMatrix):
         :rtype: :class:`float`
         
         """
-        if self.type != SCATTERING:
-            return self.convert(SCATTERING).stability_mu()
-        else:
-            s11 = self[0, 0]
-            s12 = self[0, 1]
-            s21 = self[1, 0]
-            s22 = self[1, 1]
-            delta = self.delta
-            return (1 - np.abs(s11)**2) / (np.abs(s22 - delta * np.conj(s11)) +
-                                           np.abs(s12 * s21))
-
+        return stability_mu(self)
 
     def conditional_stability_mu(self, r1, r2):
         """Returns the conditional stability factor mu as defined in
@@ -267,19 +215,7 @@ class TwoPortMatrix(NPortMatrix):
         :rtype: :class:`float`
         
         """
-        if self.type != SCATTERING:
-            return self.convert(SCATTERING).stability_mu()
-        else:
-            s11 = self[0, 0]
-            s12 = self[0, 1]
-            s21 = self[1, 0]
-            s22 = self[1, 1]
-            delta = self.delta
-            nom = 1 - (np.abs(s22) * r2)**2
-            denom = (np.abs(s11 - np.conj(s22) * delta * r2**2) +  
-                     np.abs(s12 * s21) * r2) * r1
-            return nom / denom
-
+        return conditional_stability_mu(self, r1, r2)
 
     def is_stable_k(self):
         k, delta = self.stability_k()
@@ -291,42 +227,50 @@ class TwoPortMatrix(NPortMatrix):
     def is_conditionally_stable_mu(self, r1, r2):
         return self.conditional_stability_mu(r1, r2) > 1
 
+    def stability_circle_source(self):
+        return stability_circle_source(self)
+
+    def stability_circle_load(self):
+        return stability_circle_load(self)
+
 
 class TwoPort(NPort):
     matrix_cls = TwoPortMatrix
 
-    def stability_circle_source(self):
-        center = np.zeros(len(self), complex)
-        radius = np.zeros(len(self), complex)
-        for i, twoportmatrix in enumerate(self):
-            center[i], radius[i] = twoportmatrix.stability_circle_source()
-        return center, radius
-
-    def stability_circle_load(self):
-        center = np.zeros(len(self), complex)
-        radius = np.zeros(len(self), complex)
-        for i, twoportmatrix in enumerate(self):
-            center[i], radius[i] = twoportmatrix.stability_circle_load()
-        return center, radius
-
     def stability_k(self):
-        k = np.zeros(len(self), complex)
-        delta = np.zeros(len(self), complex)
-        for i, twoportmatrix in enumerate(self):
-            k[i], delta[i] = twoportmatrix.stability_k()
-        return k, delta
+        """Returns the Rollet stability factor K and Delta
+        
+        :rtype: tuple of :class:`ndarray`s
+        
+        """
+        return stability_k(self)
 
     def stability_mu(self):
-        mu = np.zeros_like(self.freqs)
-        for i, twoportmatrix in enumerate(self):
-            mu[i] = twoportmatrix.stability_mu()
-        return mu
+        """Returns the mu stability factor
+        
+        :rtype: :class:`ndarray`
+        
+        """
+        return stability_mu(self)
 
     def conditional_stability_mu(self, r1, r2):
-        mu = np.zeros_like(self.freqs)
-        for i, twoportmatrix in enumerate(self):
-            mu[i] = twoportmatrix.conditional_stability_mu(r1, r2)
-        return mu
+        """Returns the conditional stability factor mu as defined in
+        
+        "Discussion and new proofs of the conditional stability criteria for 
+        multidevice microwave amplifiers" by M. Balsi, G. Scotti, P. Tommasino
+        and A. Trifiletti in "IEE Proceedings - Microwaves, Antennas and 
+        Propagation", vol. 153, no. 2, pp. 177-181, 2006
+
+        :param r1: maximum allowed value for the absolute value of the input
+                   reflection coefficient (0 < r1 <= 1)
+        :type r1: :class:`float`
+        :param r2: maximum allowed value for the absolute value of the input
+                   reflection coefficient (0 < r2 <= 1)
+        :type r2: :class:`float`
+        :rtype: :class:`ndarray`
+        
+        """
+        return conditional_stability_mu(self, r1, r2)
 
     def is_stable_k(self):
         for twoportmatrix in self:
@@ -346,3 +290,66 @@ class TwoPort(NPort):
                            self.z0).is_conditionally_stable_mu(r1, r2):
                 return False
         return True
+
+    def stability_circle_source(self):
+        return stability_circle_source(self)
+
+    def stability_circle_load(self):
+        return stability_circle_load(self)
+
+
+def stability_k(twoport):
+    if twoport.type != SCATTERING:
+        return stability_k(twoport.convert(SCATTERING))
+    else:
+        s11, s12, s21, s22 = twoport.parameters
+        delta = s11 * s22 - s12 * s21
+        k = ((1 - np.abs(s11)**2 - np.abs(s22)**2 + np.abs(delta)**2) /
+             (2 * np.abs(s12 * s21)))
+        return k, delta
+
+
+def stability_mu(twoport):
+    if twoport.type != SCATTERING:
+        return stability_mu(twoport.convert(SCATTERING))
+    else:
+        s11, s12, s21, s22 = twoport.parameters
+        delta = s11 * s22 - s12 * s21
+        return (1 - np.abs(s11)**2) / (np.abs(s22 - delta * np.conj(s11)) +
+                                       np.abs(s12 * s21))
+
+
+def conditional_stability_mu(twoport, r1, r2):
+    if twoport.type != SCATTERING:
+        return conditional_stability_mu(twoport.convert(SCATTERING), r1, r2)
+    else:
+        s11, s12, s21, s22 = twoport.parameters
+        delta = s11 * s22 - s12 * s21
+        nom = 1 - (np.abs(s22) * r2)**2
+        denom = (np.abs(s11 - np.conj(s22) * delta * r2**2) +  
+                 np.abs(s12 * s21) * r2) * r1
+        return nom / denom
+
+
+def stability_circle_source(twoport):
+    if twoport.type != SCATTERING:
+        return stability_circle_source(twoport.convert(SCATTERING))
+    else:
+        s11, s12, s21, s22 = twoport.parameters
+        delta = s11 * s22 - s12 * s21
+        denom = np.abs(s11)**2 - np.abs(delta)**2
+        center = np.conj(s11 - delta * np.conj(s22)) / denom
+        radius = np.abs(s12 * s21 / denom)
+        return center, radius
+
+
+def stability_circle_load(twoport):
+    if twoport.type != SCATTERING:
+        return stability_circle_load(twoport.convert(SCATTERING))
+    else:
+        s11, s12, s21, s22 = twoport.parameters
+        delta = s11 * s22 - s12 * s21
+        denom = np.abs(s22)**2 - np.abs(delta)**2
+        center = np.conj(s22 - delta * np.conj(s11)) / denom
+        radius = np.abs(s12 * s21 / denom)
+        return center, radius
