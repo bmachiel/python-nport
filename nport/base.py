@@ -98,6 +98,16 @@ class NPortMatrixBase(np.ndarray):
         """
         raise NotImplementedError
 
+    @property
+    def parameters(self):
+        """Return an iterator over the parameters in row-major order
+        
+        :returns: iterator over parameter
+        :rtype: iterator of :class:`complex`
+        
+        """
+        return self.flat
+
     def get_parameter(self, port1, port2):
         """Return the parameter as specified by the indices `port1` and `port2`
         as an ndarray
@@ -228,6 +238,18 @@ class NPortBase(NPortMatrixBase):
         super(NPortBase, self).__setstate__(super_state)
         self.freqs, = own_state
 
+    @property
+    def parameters(self):
+        """Return an iterator over the parameters in row-major order
+        
+        :returns: iterator over parameters
+        :rtype: iterator over :class:`ndarray`
+        
+        """
+        for row in range(self.ports):
+            for column in range(self.ports):
+                yield np.asarray(self[:, row, column])
+
     def get_parameter(self, port1, port2):
         """Return the parameter as specified by the indices `port1` and `port2`
         as an ndarray
@@ -260,7 +282,7 @@ class NPortBase(NPortMatrixBase):
             self.type, self.z0)
 
     def at(self, freqs):
-        """Return the interpolated n-port data at the given
+        """Return the linearly interpolated n-port data at the given
         * list of frequencies (`freqs` is iterable), or
         * at a single frequency (`freqs` is a value)
         
