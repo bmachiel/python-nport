@@ -35,7 +35,7 @@ class NPortMatrix(NPortMatrixBase):
 
     @property
     def ports(self):
-        """The number of ports in this NPortMatrix
+        """The number of ports of this :class:`NPortMatrix`
         
         :rtype: :class:`int`
         
@@ -357,7 +357,7 @@ class NPort(NPortBase):
         :rtype: :class:`int`
         
         """
-        return self[0].shape[0]
+        return self[0].ports
 
     def add(self, freq, matrix):
         """Return an NPort with the specified frequency sample added.
@@ -569,8 +569,8 @@ def dot(arg1, arg2):
         result.sort()
         return np.array(result[result.index(minf):result.index(maxf)])
     
-    if type(arg1) == NPort:
-        if type(arg2) == NPort:
+    if isinstance(arg1, NPort):
+        if isinstance(arg2, NPort):
             result_freqs = merge_freqs(arg1.freqs, arg2.freqs)
             arg1_matrices = arg1.at(result_freqs)
             arg2_matrices = arg2.at(result_freqs)
@@ -581,8 +581,8 @@ def dot(arg1, arg2):
             result_matrices = np.array([np.dot(matrix, other)
                 for matrix in arg1.matrices])
         return NPort(result_freqs, result_matrices, arg1.type, arg1.z0)
-    elif type(arg1) == TwoNPort:
-        if type(arg2) == TwoNPort:
+    elif isinstance(arg1, TwoNPort):
+        if isinstance(arg2, TwoNPort):
             def twonport_dot(l, r):
                 a = np.dot(l[0, 0], r[0, 0]) + np.dot(l[0, 1], r[1, 0])
                 b = np.dot(l[0, 0], r[0, 1]) + np.dot(l[0, 1], r[1, 1])
