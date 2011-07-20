@@ -274,20 +274,19 @@ class TwoPort(NPort):
 
     def is_stable_k(self):
         for twoportmatrix in self:
-            if not TwoPort(twoportmatrix, self.type, self.z0).is_stable_k():
+            if not twoportmatrix.is_stable_k():
                 return False
         return True
     
     def is_stable_mu(self):
         for twoportmatrix in self:
-            if not TwoPort(twoportmatrix, self.type, self.z0).is_stable_mu():
+            if not twoportmatrix.is_stable_mu():
                 return False
         return True
 
     def is_conditionally_stable_mu(self, r1, r2):
         for twoportmatrix in self:
-            if not TwoPort(twoportmatrix, self.type,
-                           self.z0).is_conditionally_stable_mu(r1, r2):
+            if not twoportmatrix.is_conditionally_stable_mu(r1, r2):
                 return False
         return True
 
