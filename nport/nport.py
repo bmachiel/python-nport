@@ -42,6 +42,14 @@ class NPortMatrix(NPortMatrixBase):
         """
         return self.shape[0]
 
+    def power(self, n):
+        """Return this :class:`NPortMatrix` raised to the `n`\ th power
+        
+        :rtype: :class:`NPortMatrix`
+        
+        """
+        return np.linalg.matrix_power(self, n)
+
     def twonportmatrix(self, inports=None, outports=None):
         """Return the 2n-port matrix represented by this n-port matrix
         
@@ -303,10 +311,7 @@ class NPortMatrix(NPortMatrixBase):
         if self.type != SCATTERING:
             return self.convert(SCATTERING).ispassive()
         else:
-            if np.max(np.sum(np.abs(np.asarray(self))**2, 1)) > 1:
-                return False
-            else:
-                return True
+            return np.max(np.sum(np.abs(np.asarray(self))**2, 1)) <= 1
 
     def is_reciprocal(self):
         """Check whether this n-port matrix is reciprocal
@@ -359,6 +364,15 @@ class NPort(NPortBase):
         """
         return self[0].ports
 
+    def power(self, n):
+        """Return this :class:`NPort`\'s matrices raised to the `n`\ th power
+        
+        :rtype: :class:`NPort`
+        
+        """
+        matrices = [np.linalg.matrix_power(m, n) for m in self]
+        return self.__class__(self.freqs, matrices, self.type, self.z0)
+
     def add(self, freq, matrix):
         """Return an NPort with the specified frequency sample added.
 
@@ -383,8 +397,8 @@ class NPort(NPortBase):
         return self.__class__(freqs, matrices, self.type, self.z0)
 
     def twonport(self, inports=None, outports=None):
-        """Convert this NPort to a TwoNPort using `inports` as the input ports
-        and `outports` as the output ports.
+        """Convert this :class:`NPort` to a :class:`TwoNPort` using `inports`
+        as the input ports and `outports` as the output ports.
         
         :param inports: the list of ports that make up the inputs of the 2n-port
         :type inports: :class:`tuple` or :class:`list`
