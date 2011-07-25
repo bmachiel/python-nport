@@ -9,10 +9,17 @@ REAL_IMAG = 'RI'
 MAG_ANGLE = 'MA'
 DB_ANGLE = 'DB'
 
-keys = {}
-keys[REAL_IMAG] = ('real', 'imag')
-keys[MAG_ANGLE] = ('mag', 'deg')
-keys[DB_ANGLE] = ('db20', 'deg')
+keys = {
+    REAL_IMAG: ('real', 'imag'),
+    MAG_ANGLE: ('mag', 'deg'),
+    DB_ANGLE: ('db20', 'deg')
+}
+
+formats = {
+    REAL_IMAG: (parameter.real, parameter.imag),
+    MAG_ANGLE: (parameter.mag, parameter.deg),
+    DB_ANGLE: (parameter.db20, parameter.deg)
+}
 
 
 class ParseError(Exception):
@@ -186,10 +193,16 @@ def write(instance, file_path, format=REAL_IMAG):
     :type instance: :class:`nport.NPort`
     :param file_path: filename to write to (without extension)
     :type file_path: str
-    :param format: determines format of the Touchstone file ('MA', 'RI' or 'DB')
+    :param format: specifies the parameter format ('MA', 'RI' or 'DB')
     :type format: str
   
     """
+    if not isinstance(instance, nport.NPort) or instance.type is not nport.S:
+        raise ValueError("Only S-type NPorts are supported currently")
+    try:
+        first, second = formats[format]
+    except KeyError:
+        raise ValueError("unknown format specified")
     file_path = file_path + ".s%dp" %  instance.ports
     file = open(file_path, 'wb')
     creationtime = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -198,6 +211,7 @@ def write(instance, file_path, format=REAL_IMAG):
     file.write("# Hz %s %s R %g\n" % (instance.type, format, instance.z0))
     flatten_order = 'F' if instance.ports == 2 else 'C'
     threeport = (instance.ports == 3)
+
     for i, freq in enumerate(instance.freqs):
         sample = "\t%g\t" % freq
         parameters = instance[i].flatten(flatten_order)
@@ -205,12 +219,6 @@ def write(instance, file_path, format=REAL_IMAG):
             if i != 0 and \
                 ((threeport and i % 3 == 0) or (not threeport and i % 4 == 0)):
                 sample += "\n\t\t"
-            if format == REAL_IMAG:
-                sample += " %g %g" % (parameter.real(element), parameter.imag(element))
-            elif format == MAG_ANGLE:
-                sample += " %g %g" % (parameter.mag(element), parameter.deg(element))
-            elif format == DB_ANGLE:
-                sample += " %g %g" % (parameter.db20(element), parameter.deg(element))
-            else:
-                raise ValueError("unknown format specified")
+            sample += " %g %g" % (first(element), second(element))
         file.write(sample + "\n")
+        
