@@ -80,7 +80,6 @@ class TwoNPortMatrix(NPortMatrixBase):
         """
         z0 = self.convert_z0test(type, z0)
         idty = np.identity(self.shape[2], dtype=complex)
-        invert = np.linalg.inv
         
         # TODO: check for singularities
         if type == self.type:

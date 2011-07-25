@@ -493,10 +493,7 @@ class NPort(NPortBase):
 
         """
         # TODO: determine type of output
-        inverted = []
-        for matrix in self:
-            nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            inverted.append(np.linalg.inv(nportmatrix))
+        inverted = [np.linalg.inv(matrix) for matrix in self]
         return NPort(self.freqs, inverted, self.type, self.z0)
 
     def recombine(self, portsets):
@@ -522,11 +519,7 @@ class NPort(NPortBase):
         * port 4 is original port 6, but with reversed polarity
 
         """
-        recombined = []
-        for matrix in self:
-            nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            recomb = nportmatrix.recombine(portsets)
-            recombined.append(recomb)
+        recombined = [matrix.recombine(portsets) for matrix in self]
         return self.__class__(self.freqs, recombined, self.type, self.z0)
 
     def shunt(self, portsets):
@@ -548,11 +541,7 @@ class NPort(NPortBase):
         * port 3 is original ports 4, 5 and 6 connected together
 
         """
-        shunted = []
-        for matrix in self:
-            nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            shunt = nportmatrix.shunt(portsets)
-            shunted.append(shunt)
+        shunted = [matrix.shunt(portsets) for  matrix in self]
         return self.__class__(self.freqs, shunted, self.type, self.z0)
 
     def is_passive(self):
@@ -561,8 +550,8 @@ class NPort(NPortBase):
         :rtype: :class:`bool`
         
         """
-        for nportmatrix in self:
-            if not NPortMatrix(nportmatrix, self.type, self.z0).ispassive():
+        for matrix in self:
+            if not matrix.is_passive():
                 return False
         return True
 
