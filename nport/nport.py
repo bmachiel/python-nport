@@ -99,6 +99,15 @@ class NPortMatrix(NPortMatrixBase):
         matrix = np.array([[x11, x12], [x21, x22]])
         return TwoNPortMatrix(matrix, self.type, self.z0)
 
+    def reverse(self):
+        """Return an :class:`NPortMatrix` with the ports reversed. This simply
+        flips the matrix horizontally and vertically.
+        
+        :rtype: :class:`NPortMatrix`
+        
+        """
+        return self[::-1, ::-1]
+
     def renormalize(self, z0):
         """Renormalize the n-port parameters to `z0`
         
@@ -435,6 +444,16 @@ class NPort(NPortBase):
                 renormalized.append(nportmatrix.renormalize(z0))
             result = self.__class__(self.freqs, renormalized, self.type, z0)
         return result
+
+    def reverse(self):
+        """Return an :class:`NPort` with the ports reversed. This simply flips
+        the matrices horizontally and vertically.
+        
+        :rtype: :class:`NPort`
+        
+        """
+        reversed = self[:, ::-1, ::-1]
+        return NPort(self.freqs, reversed, self.type, self.z0)
 
     def convert(self, type, z0=None):
         """Convert to another n-port matrix representation
