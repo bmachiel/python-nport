@@ -235,14 +235,15 @@ class MulticonductorTransmissionLine(object):
     * natural propagation constant matrices and characteristic impedance
       matrices
 
-    For non-uniform lines, the characteristic impedance matrices differ for forward 
-    and backward propagation:
+    For non-uniform lines, the characteristic impedance matrices differ for
+    forward and backward propagation:
     
     * :attr:`modal_z0_forward` and :attr:`natural_z0_forward`
     * :attr:`modal_z0_backward` and :attr:`natural_z0_backward`
 
-    For reciprocal lines, the propagation constant matrices are the same for forward
-    and backward propagation, while for non-reciprocal lines they differ.
+    For reciprocal lines, the propagation constant matrices are the same for
+    forward and backward propagation, while for non-reciprocal lines they
+    differ.
 
     """
     def __init__(self, twonport, length, reciprocal=True):
