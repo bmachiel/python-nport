@@ -312,6 +312,37 @@ class NPortMatrix(NPortMatrixBase):
             y_shunted = self.convert(ADMITTANCE).shunt(portsets)
             return y_shunted.convert(self.type)
 
+    def parallel(self, other, portmap=None):
+        """Connect `other` in parallel with this :class:`NPortMatrix`.
+
+        :param portmap: specifies to which ports of `other` should be connected
+                        to the ports of this :class:`NPortMatrix`. A zero in the
+                        n-th position indicates that nothing should be placed in
+                        parallel with the port n. A positive integer in position
+                        m indicates the port number of `other` that should be
+                        connected to port m.
+        :type portmap: iterable of :class:`int`\s
+        :rtype: :class:`NPortMatrix`
+        
+        """
+        assert len(portmap) == self.ports
+        if other.type != ADMITTANCE:
+            other = other.convert(ADMITTANCE)
+        if portmap is None:
+            assert other.ports == self.ports
+            portmap = range(1, self.ports + 1)
+        if self.type == ADMITTANCE:
+            t = np.zeros((self.ports, other.ports), dtype=float)
+            for i, port in enumerate(portmap):
+                if port != 0:
+                    t[i, port - 1] = 1
+            t = np.matrix(t, dtype=float)
+            other_reshape = t * np.asarray(other) * t.T
+            return self.__class__(self + other_reshape, self.type, self.z0)
+        else:
+            y_paralleled = self.convert(ADMITTANCE).parallel(other, portmap)
+            return y_paralleled.convert(self.type)
+
     def is_passive(self):
         """Check whether this n-port matrix is passive
         
@@ -531,8 +562,26 @@ class NPort(NPortBase):
         * port 3 is original ports 4, 5 and 6 connected together
 
         """
-        shunted = [matrix.shunt(portsets) for  matrix in self]
+        shunted = [matrix.shunt(portsets) for matrix in self]
         return self.__class__(self.freqs, shunted, self.type, self.z0)
+
+    def parallel(self, other, portmap=None):
+        """Connect `other` in parallel with this :class:`NPort`.
+
+        :param portmap: specifies to which ports of `other` should be connected
+                        to the ports of this :class:`NPort`. A zero in the n-th
+                        position indicates that nothing should be placed in
+                        parallel with the port n. A positive integer in position
+                        m indicates the port number of `other` that should be
+                        connected to port m.
+        :type portmap: iterable of :class:`int`\s
+        :rtype: :class:`NPort`
+        
+        """
+        other = other.at(self.freqs)
+        paralleled = [matrix.parallel(other_matrix, portmap)
+                      for matrix, other_matrix in zip(self, other)]
+        return self.__class__(self.freqs, paralleled, self.type, self.z0)
 
     def is_passive(self):
         """Check whether this :class:`NPort` is passive
