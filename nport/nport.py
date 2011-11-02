@@ -91,6 +91,7 @@ class NPortMatrix(NPortMatrixBase):
                 matrix2.append(matrix[column])
             matrix = np.asarray(matrix2).T
 
+        # TODO: rewrite using reshape()?
         matrix = np.asmatrix(matrix)
         x11 = matrix[0:n  , 0:n  ]
         x12 = matrix[0:n  , n:2*n]
@@ -562,6 +563,16 @@ class NPort(NPortBase):
         dphase = np.gradient(phase)
         dfreq = np.gradient(self.freqs)
         return - dphase / (2 * np.pi * dfreq)
+
+
+def array_dot(arg1, arg2):
+    """Matrix multiplication for arrays, element-wise in the first dimension"""
+    if arg1.shape != arg2.shape:
+        raise ValueError("arguments should have the same number of arrays")
+    rows = arg1.shape[1]
+    # from http://jameshensman.wordpress.com/2010/06/14/multiple-matrix-multiplication-in-numpy/
+    return np.sum(np.transpose(arg1, (0, 2, 1)).reshape(-1, rows, rows, 1) *
+                  arg2.reshape(-1, rows, 1, rows), 1)
 
 
 def dot(arg1, arg2):
