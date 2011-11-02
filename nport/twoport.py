@@ -237,6 +237,56 @@ class TwoPortMatrix(NPortMatrix):
 class TwoPort(NPort):
     matrix_cls = TwoPortMatrix
 
+    def convert(self, type, z0=None):
+        # for two-ports, we can operate on arrays, speeding things up a lot
+        # TODO: add other conversions (now handled by NPort.convert())
+        z0 = self.convert_z0test(type, z0)
+        
+        if self.type == ABCD and type == S:
+            # via scattering transfer parameters
+            t = self.convert(T, z0)
+            result = t.convert(S)
+        elif self.type == T and type == S:
+            t11, t12, t21, t22 = self.parameters
+            t11i = 1 / t11
+            s11 = t21 * t11i
+            s12 = t22 - t21 * t11i * t12
+            s21 = t11i
+            s22 = - t11i * t12
+            matrices = np.column_stack(((s11, s12, s21, s22))).reshape((-1,2,2))
+            result = self.__class__(self.freqs, matrices, S, self.z0)
+            if z0 != self.z0:
+                result = result.renormalize(z0)
+        elif self.type == S and type == T:
+            # first renormalize
+            if z0 != self.z0:
+                result = self.renormalize(z0).convert(T, z0)
+            else:
+                s11, s12, s21, s22 = self.parameters
+                s21i = 1 / s21
+                t11 = s21i
+                t12 = - s21i * s22
+                t21 = s11 * s21i
+                t22 = s12 - s11 * s21i * s22
+                matrices = np.column_stack(((t11, t12,
+                                             t21, t22))).reshape((-1,2,2))
+                t = self.__class__(self.freqs, matrices, T, z0)
+                result = t.renormalize(z0)
+        elif self.type == ABCD and type == T:
+            a, b, c, d = self.parameters
+            b0 = b / z0
+            c0 = c * z0
+            t11 = a + b0 + c0 + d
+            t12 = a - b0 + c0 - d
+            t21 = a + b0 - c0 - d
+            t22 = a - b0 - c0 + d
+            matrices = np.column_stack(((t11, t12, t21, t22))).reshape((-1,2,2))
+            result = 0.5 * self.__class__(self.freqs, matrices, T, z0)
+        else:
+            result = super(TwoPort, self).convert(type, z0)
+            
+        return result
+
     def stability_k(self):
         """Returns the Rollet stability factor K and Delta
         
