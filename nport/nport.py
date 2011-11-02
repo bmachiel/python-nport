@@ -416,13 +416,8 @@ class NPort(NPortBase):
         :rtype: :class:`TwoNPort`
 
         """
-        twonportmatrices = []
-        for matrix in self:
-            nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            twonportmatrices.append(nportmatrix.twonportmatrix(inports,
-                                                               outports))
-        return TwoNPort(self.freqs, twonportmatrices, self.type,
-                                 self.z0)
+        twonportmatrices = [m.twonportmatrix(inports, outports) for m in self]
+        return TwoNPort(self.freqs, twonportmatrices, self.type, self.z0)
 
     def renormalize(self, z0):
         """Renormalize the n-port parameters to `z0`
@@ -438,10 +433,7 @@ class NPort(NPortBase):
         if z0 == self.z0:
             result = self
         else:
-            renormalized = []
-            for matrix in self:
-                nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-                renormalized.append(nportmatrix.renormalize(z0))
+            renormalized = [matrix.renormalize(z0) for matrix in self]
             result = self.__class__(self.freqs, renormalized, self.type, z0)
         return result
 
@@ -465,10 +457,7 @@ class NPort(NPortBase):
         :type z0: :class:`float`
 
         """
-        converted = []
-        for matrix in self:
-            nportmatrix = NPortMatrix(matrix, self.type, self.z0)
-            converted.append(nportmatrix.convert(type, z0))
+        converted = [matrix.convert(type, z0) for matrix in self]
         return NPort(self.freqs, converted, type, z0)
 
     def submatrix(self, ports):
