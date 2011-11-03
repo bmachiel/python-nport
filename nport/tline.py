@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as np
-import nport
+from .base import TRANSMISSION
 from twonport import TwoNPort
 
 
@@ -26,7 +26,7 @@ class TransmissionLine(object):
         """
         if not isinstance(twonport, TwoNPort) or twonport.ports != 2:
             raise TypeError
-        self.twonport = twonport.convert(nport.TRANSMISSION)
+        self.twonport = twonport.convert(TRANSMISSION)
         self.freqs = self.twonport.freqs
         self.length = length
         
