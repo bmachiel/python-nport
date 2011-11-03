@@ -257,7 +257,7 @@ class MulticonductorTransmissionLine(object):
         :type reciprocal: bool
         
         """
-        self.twonport = twonport.convert(nport.TRANSMISSION)
+        self.twonport = twonport.convert(TRANSMISSION)
         self.freqs = self.twonport.freqs
         self.length = length
         
