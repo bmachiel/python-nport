@@ -324,10 +324,25 @@ class MulticonductorTransmissionLine(object):
             wl_prod = np.array([np.dot(dic, aib)
                                 for dic, aib in zip(di_dot_c, ai_dot_b)])
 
-            self.e0, self.t0 = eigenshuffle(t0_prod)
-            self.el, self.tl = eigenshuffle(tl_prod)
-            self.ew0, self.w0 = eigenshuffle(w0_prod)
-            self.ewl, self.wl = eigenshuffle(wl_prod)
+            # shift eigenvalues for numeric stability
+            t0_prod_shifted, t0_traces = shift_eigenvalues(t0_prod)
+            tl_prod_shifted, tl_traces = shift_eigenvalues(tl_prod)
+            w0_prod_shifted, w0_traces = shift_eigenvalues(w0_prod)
+            wl_prod_shifted, wl_traces = shift_eigenvalues(wl_prod)
+    
+            e0_shifted, self.t0 = eigenshuffle(t0_prod_shifted)
+            el_shifted, self.tl = eigenshuffle(tl_prod_shifted)
+            ew0_shifted, self.w0 = eigenshuffle(w0_prod_shifted)
+            ewl_shifted, self.wl = eigenshuffle(wl_prod_shifted)
+
+            self.e0 = np.array([eig + trace
+                                for eig, trace in zip(e0_shifted, t0_traces)])
+            self.el = np.array([eig + trace
+                                for eig, trace in zip(el_shifted, tl_traces)])
+            self.ew0 = np.array([eig + trace
+                                 for eig, trace in zip(ew0_shifted, w0_traces)])
+            self.ewl = np.array([eig + trace
+                                 for eig, trace in zip(ewl_shifted, wl_traces)])
 
         self.t0inv = np.array([np.linalg.inv(t0) for t0 in self.t0])
         self.tlinv = np.array([np.linalg.inv(tl) for tl in self.tl])
@@ -357,7 +372,7 @@ class MulticonductorTransmissionLine(object):
         diag_bm = np.asarray([np.diag(bm) for bm in self.bm])
         diag_cm = np.asarray([np.diag(cm) for cm in self.cm])
         diag_dm = np.asarray([np.diag(dm) for dm in self.dm])
-        
+
         sum = (diag_am + diag_dm) / 2.0
         if reciprocal:
             # TODO detect uniform MTLs
@@ -481,3 +496,16 @@ def unwrap_log(arg):
     """natural logarithm of complex numbers (first unwrap)"""
     mag, ang = np.abs(arg), np.unwrap(np.angle(arg))
     return np.log(mag) + 1j * ang
+
+
+def shift_eigenvalues(matrices):
+    """Shift eigenvalues of a matrix to make eigenvalue calculation numerically
+    more stable
+    
+    """
+    # [FAR04] 1.3.2
+    n = matrices.shape[-1]
+    traces = np.array([np.trace(m) / n for m in matrices])
+    shifted = np.array([m - np.identity(n) * t
+                        for m, t in zip(matrices, traces)])
+    return shifted, traces
