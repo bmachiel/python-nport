@@ -277,20 +277,6 @@ class MulticonductorTransmissionLine(object):
         self.c = self.twonport.get_parameter(2, 1)
         self.d = self.twonport.get_parameter(2, 2)
         
-        #print "AD-CD =", np.dot(self.a[-1], self.d[-1].T) - np.dot(self.b[-1], self.c[-1].T)
-
-        # (INCORRECT) calculate per-unit-length RLGC [EIS92]
-        #~ tmp = (self.a + self.d) / 2.0
-        #~ #expgaml = tmp + np.sqrt( (tmp)**2 - 1 ) # MATLAB definition for arccosh
-        #~ #self.gamma_ = np.log(expgaml) / self.length
-        #~ self.gamma_ = np.arccosh(tmp) / self.length
-        #~ self.z0_ = np.sqrt(self.b / self.c)
-        
-        #~ self.rpm = (self.gamma_ * self.z0_).real
-        #~ self.lpm = (((self.gamma_ * self.z0_).imag).T / (2 * np.pi * self.freqs)).T
-        #~ self.gpm = (self.gamma_ / self.z0_).real
-        #~ self.cpm = (((self.gamma_ / self.z0_).imag).T / (2 * np.pi * self.freqs)).T
-
         # calculate eigenvalues and eigenvectors
         if reciprocal:
             self.b_dot_ct = np.array([np.dot(b, c.T)
