@@ -372,32 +372,27 @@ class MulticonductorTransmissionLine(object):
         diag_cm = np.asarray([np.diag(cm) for cm in self.cm])
         diag_dm = np.asarray([np.diag(dm) for dm in self.dm])
         
+        sum = (diag_am + diag_dm) / 2.0
         if reciprocal:
-            tmp = (diag_am + diag_dm) / 2.0
-            expgaml = tmp + np.sqrt( (tmp)**2 - 1 )
-            expminusgaml = tmp - np.sqrt( (tmp)**2 - 1 )
-                # this uses the MATLAB definition for arccosh
-            #self.modal_z0 = np.sqrt(diag_bm / diag_cm)
-            self.modal_gamma_forward = np.log(expgaml) / self.length
-            self.modal_gamma_backward = self.modal_gamma_forward
-            self.modal_z0_forward = diag_bm / (expgaml - diag_am)
-            self.modal_z0_backward = diag_bm / (diag_am - expminusgaml)
             # TODO detect uniform MTLs
             #   based on T0, Tl, W0, Wl ?
             #   np.max(self.modal_z0_forward - self.modal_z0_backward)
+            delta = unwrap_sqrt(sum**2 - 1)
         else:
-            sum = (diag_am + diag_dm) / 2.0
             ad_bc = diag_am * diag_dm - diag_bm * diag_cm
-           
             delta = unwrap_sqrt(sum**2 - ad_bc)
-            exp_gl_forward = sum + delta
-            exp_gl_backward = sum - delta
-            
-            self.modal_gamma_forward = unwrap_log(exp_gl_forward) / self.length
-            self.modal_gamma_backward = - unwrap_log(exp_gl_backward) / self.length
+           
+        exp_gl_forward = sum + delta
+        exp_gl_backward = sum - delta
+        
+        self.modal_gamma_forward = unwrap_log(exp_gl_forward) / self.length
+        self.modal_gamma_backward = - unwrap_log(exp_gl_backward) / self.length
 
-            self.modal_z0_forward = (exp_gl_forward - diag_dm) / diag_cm
-            self.modal_z0_backward = (diag_dm - exp_gl_backward) / diag_cm
+        self.modal_z0_forward = (exp_gl_forward - diag_dm) / diag_cm
+        self.modal_z0_backward = (diag_dm - exp_gl_backward) / diag_cm
+        #~ if reciprocal:
+            #~ self.modal_z0_forward = diag_bm / (exp_gl_forward - diag_am)
+            #~ self.modal_z0_backward = diag_bm / (diag_am - exp_gl_backward)
 
         self.modal_y0_forward = 1.0 / self.modal_z0_forward
         self.modal_y0_backward = 1.0 / self.modal_z0_backward
@@ -408,7 +403,8 @@ class MulticonductorTransmissionLine(object):
         # NOTE: verify!
         #   z0_forward and z0_backward?
         #   t0, tl, w0, wl?
-        # 1) compute gamma and Z0 matrices in natural coordinates [FAR93] eq 1.59, [PAU08] eq 7.77 (?)
+        # 1) compute gamma and Z0 matrices in natural coordinates
+        #     [FAR93] eq 1.59, [PAU08] eq 7.77 (?)
         self.natural_gamma_forward = \
             np.asarray([np.dot(np.dot(t0, np.diag(gam)), tlinv)
                         for t0, gam, tlinv
@@ -439,7 +435,8 @@ class MulticonductorTransmissionLine(object):
                                               in self.natural_y0_forward])
             # natural wave impedance matrices
 
-        # 2) calculate per-unit-length Z, Y and RLGC matrices [FAR93] eq 1.58 & 1.60
+        # 2) calculate per-unit-length Z, Y and RLGC matrices
+        #     [FAR93] eq 1.58 & 1.60
         self.zpm_forward = np.asarray([np.dot(gam, zw)
                                        for gam, zw
                                        in zip(self.natural_gamma_forward,
@@ -449,17 +446,11 @@ class MulticonductorTransmissionLine(object):
                                        in zip(self.natural_y0_forward,
                                               self.natural_gamma_forward)])
         
+        two_pi_freqs = 2 * np.pi * self.freqs
         self._rpm_forward = self.zpm_forward.real
-        self._lpm_forward = (self.zpm_forward.imag.T /
-                             (2 * np.pi * self.freqs)).T
+        self._lpm_forward = (self.zpm_forward.imag.T / two_pi_freqs).T
         self._gpm_forward = self.ypm_forward.real
-        self._cpm_forward = (self.ypm_forward.imag.T /
-                             (2 * np.pi * self.freqs)).T
-
-        # gamma's should have positive betas (not done above so as not to ruin
-        # RLGC calculation)
-        self.modal_gamma_forward *= np.sign(self.modal_gamma_forward.imag)
-        self.modal_gamma_backward *= np.sign(self.modal_gamma_backward.imag)
+        self._cpm_forward = (self.ypm_forward.imag.T / two_pi_freqs).T
 
         self.modal_gamma = self.modal_gamma_forward
         
