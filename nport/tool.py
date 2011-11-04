@@ -1,3 +1,4 @@
+from base import SCATTERING
 import touchstone, citi
 
 def main():
@@ -38,6 +39,7 @@ def main():
     if options.recombine:
         nport = nport.recombine(eval("[" + options.recombine + "]"))
 
+    nport = nport.convert(SCATTERING)
     outformats = {'tstone': touchstone, 'citi': citi}
     outformat = outformats[options.format.lower()]
     outformat.write(nport, args[1])
