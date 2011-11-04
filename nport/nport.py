@@ -220,7 +220,7 @@ class NPortMatrix(NPortMatrixBase):
                          this :class:`tuple` acts as the ground reference to the
                          first element.
         :type portsets: iterable of :class:`int`\s and :class:`tuple`\s
-        :rtype: :class:`NPortMatrix`
+        :rtype: :class:`NPortMatrix` (type :data:`Z`)
         
         >>> recombine([(1,3), (2,4), 5, -6]
         
@@ -257,7 +257,7 @@ class NPortMatrix(NPortMatrixBase):
             return self.__class__(result, self.type, self.z0)
         else:
             z_recombined = self.convert(IMPEDANCE).recombine(portsets)
-            return z_recombined.convert(self.type)
+            return z_recombined
 
     def shunt(self, portsets):
         """Connect ports together, reducing the number of ports of this
@@ -267,7 +267,7 @@ class NPortMatrix(NPortMatrixBase):
                          needs to be kept as-is. A :class:`tuple` specifies a
                          set of ports that are to be connected together.
         :type portsets: iterable of :class:`int`\s and :class:`tuple`\s
-        :rtype: :class:`NPortMatrix`
+        :rtype: :class:`NPortMatrix` (type :data:`Y`)
 
         >>> shunt([1, (2, 3), (4, 5, 6)]
         
@@ -278,6 +278,7 @@ class NPortMatrix(NPortMatrixBase):
         * port 3 is original ports 4, 5 and 6 connected together
 
         """
+        # TODO: should be possible with m * self * m.T transformation, no?
         if self.type == ADMITTANCE:
             # columns
             tmp = np.zeros((self.ports, len(portsets)), dtype=complex)
@@ -310,7 +311,7 @@ class NPortMatrix(NPortMatrixBase):
             return self.__class__(result, self.type, self.z0)
         else:
             y_shunted = self.convert(ADMITTANCE).shunt(portsets)
-            return y_shunted.convert(self.type)
+            return y_shunted
 
     def parallel(self, other, portmap=None):
         """Connect `other` in parallel with this :class:`NPortMatrix`.
@@ -322,7 +323,7 @@ class NPortMatrix(NPortMatrixBase):
                         m indicates the port number of `other` that should be
                         connected to port m.
         :type portmap: iterable of :class:`int`\s
-        :rtype: :class:`NPortMatrix`
+        :rtype: :class:`NPortMatrix` (type :data:`Y`)
         
         """
         assert len(portmap) == self.ports
@@ -341,7 +342,7 @@ class NPortMatrix(NPortMatrixBase):
             return self.__class__(self + other_reshape, self.type, self.z0)
         else:
             y_paralleled = self.convert(ADMITTANCE).parallel(other, portmap)
-            return y_paralleled.convert(self.type)
+            return y_paralleled
 
     def is_passive(self):
         """Check whether this n-port matrix is passive
@@ -541,7 +542,8 @@ class NPort(NPortBase):
 
         """
         recombined = [matrix.recombine(portsets) for matrix in self]
-        return self.__class__(self.freqs, recombined, self.type, self.z0)
+        return self.__class__(self.freqs, recombined,
+                              recombined[0].type, recombined[0].z0)
 
     def shunt(self, portsets):
         """Connect ports together, reducing the number of ports of this
@@ -563,7 +565,8 @@ class NPort(NPortBase):
 
         """
         shunted = [matrix.shunt(portsets) for matrix in self]
-        return self.__class__(self.freqs, shunted, self.type, self.z0)
+        return self.__class__(self.freqs, shunted,
+                              shunted[0].type, shunted[0].z0)
 
     def parallel(self, other, portmap=None):
         """Connect `other` in parallel with this :class:`NPort`.
@@ -581,7 +584,8 @@ class NPort(NPortBase):
         other = other.at(self.freqs)
         paralleled = [matrix.parallel(other_matrix, portmap)
                       for matrix, other_matrix in zip(self, other)]
-        return self.__class__(self.freqs, paralleled, self.type, self.z0)
+        return self.__class__(self.freqs, paralleled,
+                              paralleled[0].type, paralleled[0].z0)
 
     def is_passive(self):
         """Check whether this :class:`NPort` is passive
