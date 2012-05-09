@@ -373,33 +373,23 @@ class MulticonductorTransmissionLine(object):
         diag_cm = np.asarray([np.diag(cm) for cm in self.cm])
         diag_dm = np.asarray([np.diag(dm) for dm in self.dm])
 
-        sum = (diag_am + diag_dm) / 2.0
-        if reciprocal:
-            # TODO detect uniform MTLs
-            #   based on T0, Tl, W0, Wl ?
-            #   np.max(self.modal_z0_forward - self.modal_z0_backward)
-            delta = unwrap_sqrt(sum**2 - 1)
-        else:
-            ad_bc = diag_am * diag_dm - diag_bm * diag_cm
-            delta = unwrap_sqrt(sum**2 - ad_bc)
-           
-        exp_gl_forward = sum + delta
-        exp_gl_backward = sum - delta
+        sum = diag_am + diag_dm
+        diff = diag_am - diag_dm
+        ad_bc = diag_am * diag_dm - diag_bm * diag_cm
+        sq = unwrap_sqrt(sum**2 - 4 * ad_bc)
+
+        exp_mgl_forward = 2 / (sum + sq)
+        exp_mgl_backward = (sum - sq) / 2
+
+        self.modal_gamma_forward = - unwrap_log(exp_mgl_forward) / self.length
+        self.modal_gamma_backward = - unwrap_log(exp_mgl_backward) / self.length
+
+        self.modal_z0_forward = (sq + diff) / (2 * diag_cm)
+        self.modal_z0_backward = (sq - diff) / (2 * diag_cm)
         
-        self.modal_gamma_forward = unwrap_log(exp_gl_forward) / self.length
-        self.modal_gamma_backward = - unwrap_log(exp_gl_backward) / self.length
-
-        self.modal_z0_forward = (exp_gl_forward - diag_dm) / diag_cm
-        self.modal_z0_backward = (diag_dm - exp_gl_backward) / diag_cm
-        #~ if reciprocal:
-            #~ self.modal_z0_forward = diag_bm / (exp_gl_forward - diag_am)
-            #~ self.modal_z0_backward = diag_bm / (diag_am - exp_gl_backward)
-
         self.modal_y0_forward = 1.0 / self.modal_z0_forward
         self.modal_y0_backward = 1.0 / self.modal_z0_backward
         
-        # TODO: unwrap gamma
-
         # calculate (natural) longitudinal RLGC matrices
         # NOTE: verify!
         #   z0_forward and z0_backward?
