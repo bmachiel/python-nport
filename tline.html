@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -5,22 +7,23 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nport.tline — Transmission lines &mdash; nport v0.1 documentation</title>
+    <title>nport.tline — Transmission lines &mdash; nport v0.1-73-g7443 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     '0.1-73-g7443',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
-    <link rel="top" title="nport v0.1 documentation" href="index.html" />
+    <link rel="top" title="nport v0.1-73-g7443 documentation" href="index.html" />
     <link rel="up" title="Modules" href="modules.html" />
     <link rel="next" title="nport.deemb — De-embedding tools" href="deemb.html" />
     <link rel="prev" title="nport — n-ports and 2n-ports" href="nport.html" /> 
@@ -33,15 +36,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="deemb.html" title="nport.deemb — De-embedding tools"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="nport.html" title="nport — n-ports and 2n-ports"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li>
           <li><a href="modules.html" accesskey="U">Modules</a> &raquo;</li> 
       </ul>
     </div>  
@@ -52,70 +55,103 @@
           <div class="body">
             
   <div class="section" id="module-nport.tline">
-<h1><tt class="xref docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines<a class="headerlink" href="#module-nport.tline" title="Permalink to this headline">¶</a></h1>
-<p>For now, only two-conductor transmission lines are supported.</p>
+<span id="nport-tline-transmission-lines"></span><h1><a class="reference internal" href="#module-nport.tline" title="nport.tline: Transmission line tools"><tt class="xref py py-mod docutils literal"><span class="pre">nport.tline</span></tt></a> &#8212; Transmission lines<a class="headerlink" href="#module-nport.tline" title="Permalink to this headline">¶</a></h1>
+<p>A distinction is made between simple two-conductor transmission lines and
+multiconductor transmission lines. The latter can be analyzed in terms of
+propagating modes.</p>
 <div class="section" id="two-conductor-transmission-lines">
 <h2>Two-conductor transmission lines<a class="headerlink" href="#two-conductor-transmission-lines" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="nport.tline.TransmissionLine">
-<em class="property">class </em><tt class="descclassname">nport.tline.</tt><tt class="descname">TransmissionLine</tt><big>(</big><em>twonport</em>, <em>length</em><big>)</big><a class="headerlink" href="#nport.tline.TransmissionLine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class representing a two-conductor transmission line. It takes the
-2-port parameters of a transmission line and its length, and it calculates
-the transmission lines&#8217;:</p>
+<em class="property">class </em><tt class="descclassname">nport.tline.</tt><tt class="descname">TransmissionLine</tt><big>(</big><em>freqs</em>, <em>reciprocal=False</em><big>)</big><a class="headerlink" href="#nport.tline.TransmissionLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The RLGC parameters are calculated from the propagation constant and
+characteristic impedance as detailed in <a class="reference internal" href="#eis92">[EIS92]</a>.</p>
+</div>
+<div class="section" id="multi-conductor-transmission-lines">
+<h2>Multi-conductor transmission lines<a class="headerlink" href="#multi-conductor-transmission-lines" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">complete class interface and documentation</p>
+</div>
+<dl class="class">
+<dt id="nport.tline.MulticonductorTransmissionLine">
+<em class="property">class </em><tt class="descclassname">nport.tline.</tt><tt class="descname">MulticonductorTransmissionLine</tt><big>(</big><em>twonport</em>, <em>length</em>, <em>reciprocal=True</em><big>)</big><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class representing a multiconductor transmission line. It calculates:</p>
 <ul class="simple">
-<li>propagation constant <a title="nport.tline.TransmissionLine.gamma" class="reference internal" href="#nport.tline.TransmissionLine.gamma"><tt class="xref docutils literal"><span class="pre">gamma</span></tt></a>,</li>
-<li>characteristic impedance <a title="nport.tline.TransmissionLine.z0" class="reference internal" href="#nport.tline.TransmissionLine.z0"><tt class="xref docutils literal"><span class="pre">z0</span></tt></a>, and</li>
-<li>per-unit-length parameters (<a title="nport.tline.TransmissionLine.rpm" class="reference internal" href="#nport.tline.TransmissionLine.rpm"><tt class="xref docutils literal"><span class="pre">rpm</span></tt></a>, <a title="nport.tline.TransmissionLine.lpm" class="reference internal" href="#nport.tline.TransmissionLine.lpm"><tt class="xref docutils literal"><span class="pre">lpm</span></tt></a>, <a title="nport.tline.TransmissionLine.gpm" class="reference internal" href="#nport.tline.TransmissionLine.gpm"><tt class="xref docutils literal"><span class="pre">gpm</span></tt></a>, <a title="nport.tline.TransmissionLine.cpm" class="reference internal" href="#nport.tline.TransmissionLine.cpm"><tt class="xref docutils literal"><span class="pre">cpm</span></tt></a>)</li>
+<li>per-unit-length matrices (R, L, G, C),</li>
+<li>modal propagation constant matrices and characteristic impedance matrices,
+and</li>
+<li>natural propagation constant matrices and characteristic impedance
+matrices</li>
 </ul>
+<p>For non-uniform lines, the characteristic impedance matrices differ for
+forward and backward propagation:</p>
+<ul class="simple">
+<li><tt class="xref py py-attr docutils literal"><span class="pre">modal_z0_forward</span></tt> and <tt class="xref py py-attr docutils literal"><span class="pre">natural_z0_forward</span></tt></li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">modal_z0_backward</span></tt> and <tt class="xref py py-attr docutils literal"><span class="pre">natural_z0_backward</span></tt></li>
+</ul>
+<p>For reciprocal lines, the propagation constant matrices are the same for
+forward and backward propagation, while for non-reciprocal lines they
+differ.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>twonport</em> (TwoNPort) &#8211; 2-port that represents a transmission line</li>
-<li><em>length</em> (float) &#8211; physical length of the transmission line in meters</li>
+<li><strong>twonport</strong> (<em>TwoNPort</em>) &#8211; 2n-port that represents a multiconductor transmission
+line</li>
+<li><strong>length</strong> (<em>float</em>) &#8211; physical length of the transmission line in meters</li>
+<li><strong>reciprocal</strong> (<em>bool</em>) &#8211; True if <cite>twonport</cite> represents a reciprocal line</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="nport.tline.TransmissionLine.gamma">
-<tt class="descname">gamma</tt><a class="headerlink" href="#nport.tline.TransmissionLine.gamma" title="Permalink to this definition">¶</a></dt>
-<dd>Propagation constant</dd></dl>
+<dt id="nport.tline.MulticonductorTransmissionLine.cpm_forward">
+<tt class="descname">cpm_forward</tt><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine.cpm_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capacitance per meter for forward traveling waves</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="nport.tline.TransmissionLine.z0">
-<tt class="descname">z0</tt><a class="headerlink" href="#nport.tline.TransmissionLine.z0" title="Permalink to this definition">¶</a></dt>
-<dd>Characteristic impedance</dd></dl>
+<dt id="nport.tline.MulticonductorTransmissionLine.gamma_forward">
+<tt class="descname">gamma_forward</tt><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine.gamma_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward propagation constant</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="nport.tline.TransmissionLine.rpm">
-<tt class="descname">rpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.rpm" title="Permalink to this definition">¶</a></dt>
-<dd>Resistance per meter</dd></dl>
+<dt id="nport.tline.MulticonductorTransmissionLine.gpm_forward">
+<tt class="descname">gpm_forward</tt><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine.gpm_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conductance per meter for forward traveling waves</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="nport.tline.TransmissionLine.lpm">
-<tt class="descname">lpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.lpm" title="Permalink to this definition">¶</a></dt>
-<dd>Inductance per meter</dd></dl>
+<dt id="nport.tline.MulticonductorTransmissionLine.lpm_forward">
+<tt class="descname">lpm_forward</tt><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine.lpm_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inductance per meter for forward traveling waves</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="nport.tline.TransmissionLine.gpm">
-<tt class="descname">gpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.gpm" title="Permalink to this definition">¶</a></dt>
-<dd>Conductance per meter</dd></dl>
+<dt id="nport.tline.MulticonductorTransmissionLine.rpm_forward">
+<tt class="descname">rpm_forward</tt><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine.rpm_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resistance per meter for forward traveling waves</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="nport.tline.TransmissionLine.cpm">
-<tt class="descname">cpm</tt><a class="headerlink" href="#nport.tline.TransmissionLine.cpm" title="Permalink to this definition">¶</a></dt>
-<dd>Capacitance per meter</dd></dl>
+<dt id="nport.tline.MulticonductorTransmissionLine.z0_forward">
+<tt class="descname">z0_forward</tt><a class="headerlink" href="#nport.tline.MulticonductorTransmissionLine.z0_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward characteristic impedance</p>
+</dd></dl>
 
 </dd></dl>
 
-<p>The RLGC parameters are calculated from the propagation constant and
-characteristic impedance as detailed in <a class="reference internal" href="#eis92">[EIS92]</a>.</p>
-</div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p>The implementation of <a class="reference internal" href="#nport.tline.MulticonductorTransmissionLine" title="nport.tline.MulticonductorTransmissionLine"><tt class="xref py py-class docutils literal"><span class="pre">MulticonductorTransmissionLine</span></tt></a> follows <a class="reference internal" href="#far04">[FAR04]</a>.
+An example of the application of this technique can be found in <a class="reference internal" href="#far04b">[FAR04b]</a>. The
+technique was generalized in order to support non-reciprocal transmission lines.</p>
+<p>More information on the analysis of (uniform) multiconductor transmission lines
+can be found in <a class="reference internal" href="#far93">[FAR93]</a> and <a class="reference internal" href="#pau08">[PAU08]</a>.</p>
 <table class="docutils citation" frame="void" id="eis92" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -127,6 +163,44 @@ Technology</em>,
 vol. 15, no. 4, pp.483-490, 1992</td></tr>
 </tbody>
 </table>
+<table class="docutils citation" frame="void" id="far04" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[FAR04]</a></td><td>&#8220;A new generalized modal analysis theory for nonuniform
+multiconductor transmission lines&#8221;
+by J.A. Brandao Faria,
+in <em>IEEE Transactions on Power Systems</em>,
+vol. 19, no. 2, pp.926-933, 2004</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="far04b" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[FAR04b]</a></td><td>&#8220;A New Modal Analysis Theory for Multiconductor Nonuniform
+Transmission-Line Structures: Application to the Analysis of Line
+Junctions&#8221;
+by J.A. Brandao Faria,
+in <em>IEEE Transactions on Power Systems</em>,
+vol. 19, no. 3, pp.1380-1386, 2004</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="far93" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[FAR93]</a></td><td>&#8220;Multiconductor Transmission-Line Structures - Modal Analysis
+Techniques&#8221;
+by J.A. Brandao Faria,
+Wiley-Interscience, 1993</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="pau08" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[PAU08]</a></td><td>&#8220;Analysis of Multiconductor Transmission Lines&#8221;, 2nd edition
+by Clayton R. Paul
+Wiley-IEEE, 2008</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -136,39 +210,39 @@ vol. 15, no. 4, pp.483-490, 1992</td></tr>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines</a><ul>
-<li><a class="reference external" href="#two-conductor-transmission-lines">Two-conductor transmission lines</a></li>
-<li><a class="reference external" href="#references">References</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines</a><ul>
+<li><a class="reference internal" href="#two-conductor-transmission-lines">Two-conductor transmission lines</a></li>
+<li><a class="reference internal" href="#multi-conductor-transmission-lines">Multi-conductor transmission lines</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="nport.html"
-                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">nport</span></tt> &#8212; n-ports and 2n-ports</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="deemb.html"
-                                  title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">nport.deemb</span></tt> &#8212; De-embedding tools</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/tline.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nport.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">nport</span></tt> &#8212; n-ports and 2n-ports</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="deemb.html"
+                        title="next chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">nport.deemb</span></tt> &#8212; De-embedding tools</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tline.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -180,7 +254,7 @@ vol. 15, no. 4, pp.483-490, 1992</td></tr>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="deemb.html" title="nport.deemb — De-embedding tools"
@@ -188,13 +262,13 @@ vol. 15, no. 4, pp.483-490, 1992</td></tr>
         <li class="right" >
           <a href="nport.html" title="nport — n-ports and 2n-ports"
              >previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li>
           <li><a href="modules.html" >Modules</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Brecht Machiels.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+        &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
     </div>
   </body>
 </html>

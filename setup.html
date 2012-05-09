@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -5,23 +7,24 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installing nport &mdash; nport v0.1 documentation</title>
+    <title>Getting nport &mdash; nport v0.1-73-g7443 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     '0.1-73-g7443',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
-    <link rel="top" title="nport v0.1 documentation" href="index.html" />
-    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="top" title="nport v0.1-73-g7443 documentation" href="index.html" />
+    <link rel="next" title="Tutorial" href="tutorial.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
   </head>
   <body>
@@ -32,15 +35,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="Modules"
+          <a href="tutorial.html" title="Tutorial"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -49,20 +52,45 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="installing-nport">
-<span id="setup"></span><h1>Installing nport<a class="headerlink" href="#installing-nport" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="getting-nport">
+<span id="setup"></span><h1>Getting <a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-class docutils literal"><span class="pre">nport</span></tt></a><a class="headerlink" href="#getting-nport" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>The <a title="n-ports and 2n-ports" class="reference external" href="nport.html#module-nport"><tt class="xref docutils literal"><span class="pre">nport</span></tt></a> package requires at least version 2.5 of Python.</p>
-<p>As for Python packages, <a title="n-ports and 2n-ports" class="reference external" href="nport.html#module-nport"><tt class="xref docutils literal"><span class="pre">nport</span></tt></a> depends on numpy and scipy. <a title="n-ports and 2n-ports" class="reference external" href="nport.html#module-nport"><tt class="xref docutils literal"><span class="pre">nport</span></tt></a>
-has been tested with numpy 1.4 and scipy 0.8, but older versions of these will
-likely work too.</p>
+<p>The <a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-mod docutils literal"><span class="pre">nport</span></tt></a> package requires at least version 2.5 of Python.</p>
+<p>As for Python packages, <a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-mod docutils literal"><span class="pre">nport</span></tt></a> depends on <a class="reference external" href="http://www.scipy.org/">NumPy and SciPy</a>. It has been
+tested with NumPy 1.4 and SciPy 0.8, but older versions of these will likely
+work too. Try it, and let me know!</p>
+<p>If you don&#8217;t already have NumPy and SciPy, I recommend installing either the
+<a class="reference external" href="http://www.enthought.com/">Enthought Python Distribution</a> (Windows and Linux) or <a class="reference external" href="http://www.pythonxy.com/">Python(x,y)</a>
+(Windows). These provide up to date versions of Python, NumPy and SciPy together
+with a bunch of other useful packages for scientific use.</p>
+<p>Not required but very useful is <a class="reference external" href="http://ipython.scipy.org/">IPython</a>. This is basically an enhanced
+interactive python shell. IPython is included in the Python distributions
+mentioned above.</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Installing <a title="n-ports and 2n-ports" class="reference external" href="nport.html#module-nport"><tt class="xref docutils literal"><span class="pre">nport</span></tt></a> can be done in the standard way:</p>
+<p>The most convenient option for getting <a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-mod docutils literal"><span class="pre">nport</span></tt></a> is by using <a class="reference external" href="http://pip.openplans.org/">pip</a> or
+<a class="reference external" href="http://pypi.python.org/pypi/setuptools">easy_install</a>. To automatically download the archive from <a class="reference external" href="http://pypi.python.org">PyPI</a> and install
+it, run:</p>
+<div class="highlight-python"><pre>pip install nport</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>easy_install nport</pre>
+</div>
+<p>If you have instead downloaded the source package, you can install it by
+unpacking the archive and running:</p>
 <div class="highlight-python"><pre>python setup.py install</pre>
 </div>
+</div>
+<div class="section" id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-mod docutils literal"><span class="pre">nport</span></tt></a> development is coordinated at
+&lt;<a class="reference external" href="https://github.com/bmachiel/python-nport">https://github.com/bmachiel/python-nport</a>&gt;. GitHub provides an <a class="reference external" href="https://github.com/bmachiel/python-nport/issues">issue tracker</a>
+where you can report any bugs you might encounter. You will need a GitHub
+account to create an issue.</p>
+<p>If you&#8217;re interested in contributing to nport development, you can easily
+<a class="reference external" href="http://help.github.com/forking/">fork</a> the project and suggest any changes by sending a pull request.</p>
 </div>
 </div>
 
@@ -72,39 +100,40 @@ likely work too.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#">Installing nport</a><ul>
-<li><a class="reference external" href="#requirements">Requirements</a></li>
-<li><a class="reference external" href="#installation">Installation</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting <tt class="docutils literal"><span class="pre">nport</span></tt></a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#development">Development</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="intro.html"
-                                  title="previous chapter">Introduction</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="modules.html"
-                                  title="next chapter">Modules</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/setup.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="next chapter">Tutorial</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/setup.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -116,20 +145,20 @@ likely work too.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="Modules"
+          <a href="tutorial.html" title="Tutorial"
              >next</a> |</li>
         <li class="right" >
           <a href="intro.html" title="Introduction"
              >previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Brecht Machiels.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+        &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
     </div>
   </body>
 </html>

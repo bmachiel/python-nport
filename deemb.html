@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -5,22 +7,23 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nport.deemb — De-embedding tools &mdash; nport v0.1 documentation</title>
+    <title>nport.deemb — De-embedding tools &mdash; nport v0.1-73-g7443 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     '0.1-73-g7443',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
-    <link rel="top" title="nport v0.1 documentation" href="index.html" />
+    <link rel="top" title="nport v0.1-73-g7443 documentation" href="index.html" />
     <link rel="up" title="Modules" href="modules.html" />
     <link rel="next" title="Formats" href="formats.html" />
     <link rel="prev" title="nport.tline — Transmission lines" href="tline.html" /> 
@@ -33,15 +36,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="formats.html" title="Formats"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="tline.html" title="nport.tline — Transmission lines"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li>
           <li><a href="modules.html" accesskey="U">Modules</a> &raquo;</li> 
       </ul>
     </div>  
@@ -52,13 +55,18 @@
           <div class="body">
             
   <div class="section" id="module-nport.deemb">
-<h1><tt class="xref docutils literal"><span class="pre">nport.deemb</span></tt> &#8212; De-embedding tools<a class="headerlink" href="#module-nport.deemb" title="Permalink to this headline">¶</a></h1>
+<span id="nport-deemb-de-embedding-tools"></span><h1><a class="reference internal" href="#module-nport.deemb" title="nport.deemb: De-embedding tools"><tt class="xref py py-mod docutils literal"><span class="pre">nport.deemb</span></tt></a> &#8212; De-embedding tools<a class="headerlink" href="#module-nport.deemb" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This module implements a number of de-embedding methods. Each de-embedding
-method is implemented as a subclass of <tt class="xref docutils literal"><span class="pre">nport.deemb.Deembedder</span></tt>.</p>
-<p>A <tt class="xref docutils literal"><span class="pre">Deembedder</span></tt> object is instantiated by passing the n-port parameters of
-the method&#8217;s dummy structures. The resulting <tt class="xref docutils literal"><span class="pre">Deembedder</span></tt> object can then
+method is implemented as a subclass of <tt class="xref py py-class docutils literal"><span class="pre">Deembedder</span></tt>. Currently, only a
+few de-embedding methods are included with <a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-mod docutils literal"><span class="pre">nport</span></tt></a> (see
+<a class="reference internal" href="#de-embedding-methods"><em>De-embedding methods</em></a> below).</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="xref py py-class docutils literal"><span class="pre">Deembedder</span></tt> object is instantiated by passing the n-port parameters of
+the method&#8217;s dummy structures. The resulting <tt class="xref py py-class docutils literal"><span class="pre">Deembedder</span></tt> object can then
 de-embed any measurement:</p>
 <dl class="method">
 <dt id="nport.deemb.Deembedder.deembed">
@@ -68,11 +76,16 @@ de-embed any measurement:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>measurement</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; full measurement structure</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>measurement</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; full measurement structure</li>
+</ul>
+</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">de-embedded parameters</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">de-embedded parameters</p>
+</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a> (S)</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a> (S)</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -106,11 +119,15 @@ de-embedding method:</p>
 <span class="n">touchstone</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">deemb64</span><span class="p">,</span> <span class="s">&quot;nmos_W64_L80_Vg10_Vd12_deembedded&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Other de-embedding methods require more dummy structures. Aside from having to
+pass more arguments when instantiating the <tt class="xref py py-class docutils literal"><span class="pre">Deembedder</span></tt> object, the
+de-embedding script looks the same.</p>
 </div>
 <div class="section" id="de-embedding-methods">
-<h2>De-embedding methods<a class="headerlink" href="#de-embedding-methods" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>De-embedding methods<a class="headerlink" href="#de-embedding-methods" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="two-step-de-embedding">
 <h3>Two-step de-embedding<a class="headerlink" href="#two-step-de-embedding" title="Permalink to this headline">¶</a></h3>
+<p>This class implements basic open-short deembedding.</p>
 <dl class="class">
 <dt id="nport.deemb.TwoStep">
 <em class="property">class </em><tt class="descclassname">nport.deemb.</tt><tt class="descname">TwoStep</tt><big>(</big><em>open</em>, <em>short</em><big>)</big><a class="headerlink" href="#nport.deemb.TwoStep" title="Permalink to this definition">¶</a></dt>
@@ -120,8 +137,8 @@ de-embedding method:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>open</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; open structure</li>
-<li><em>short</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; short structure</li>
+<li><strong>open</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; open structure</li>
+<li><strong>short</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; short structure</li>
 </ul>
 </td>
 </tr>
@@ -132,6 +149,8 @@ de-embedding method:</p>
 </div>
 <div class="section" id="vandamme-three-step-de-embedding">
 <h3>Vandamme three-step de-embedding<a class="headerlink" href="#vandamme-three-step-de-embedding" title="Permalink to this headline">¶</a></h3>
+<p>This class implements the three-step deembedding algorithm by Vandamme et al.
+<a class="reference internal" href="#van01">[VAN01]</a>.</p>
 <dl class="class">
 <dt id="nport.deemb.Vandamme01">
 <em class="property">class </em><tt class="descclassname">nport.deemb.</tt><tt class="descname">Vandamme01</tt><big>(</big><em>open</em>, <em>short1</em>, <em>short2</em>, <em>through</em><big>)</big><a class="headerlink" href="#nport.deemb.Vandamme01" title="Permalink to this definition">¶</a></dt>
@@ -144,10 +163,10 @@ by Ewout P. Vandamme, Dominique M. M.-P. Schreurs, and Cees van Dinther in
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>open</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; open structure</li>
-<li><em>short1</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 1 short structure</li>
-<li><em>short2</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 2 short structure</li>
-<li><em>through</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; through structure</li>
+<li><strong>open</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; open structure</li>
+<li><strong>short1</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 1 short structure</li>
+<li><strong>short2</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 2 short structure</li>
+<li><strong>through</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; through structure</li>
 </ul>
 </td>
 </tr>
@@ -158,9 +177,10 @@ by Ewout P. Vandamme, Dominique M. M.-P. Schreurs, and Cees van Dinther in
 </div>
 <div class="section" id="kolding-four-step-de-embedding">
 <h3>Kolding four-step de-embedding<a class="headerlink" href="#kolding-four-step-de-embedding" title="Permalink to this headline">¶</a></h3>
+<p>This class implements the three-step deembedding algorithm by Kolding <a class="reference internal" href="#kol00">[KOL00]</a>.</p>
 <dl class="class">
 <dt id="nport.deemb.Kolding00">
-<em class="property">class </em><tt class="descclassname">nport.deemb.</tt><tt class="descname">Kolding00</tt><big>(</big><em>simple_open</em>, <em>simple_short</em>, <em>open</em>, <em>short1</em>, <em>short2</em>, <em>alpha=0.0</em><big>)</big><a class="headerlink" href="#nport.deemb.Kolding00" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">nport.deemb.</tt><tt class="descname">Kolding00</tt><big>(</big><em>simple_open</em>, <em>simple_short</em>, <em>open</em>, <em>short1</em>, <em>short2</em>, <em>alpha=0.0</em>, <em>asymmetric=False</em><big>)</big><a class="headerlink" href="#nport.deemb.Kolding00" title="Permalink to this definition">¶</a></dt>
 <dd><p>&#8220;A Four-Step Method for De-Embedding Gigahertz On-Wafer CMOS
 Measurements&#8221; by Troels Emil Kolding in <em>IEEE Transactions on Electron 
 Devices</em>, vol. 47, no. 4, pp. 734-740, 2000</p>
@@ -169,14 +189,16 @@ Devices</em>, vol. 47, no. 4, pp. 734-740, 2000</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>simpleopen</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; simple open structure</li>
-<li><em>simpleshort</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; simple short structure</li>
-<li><em>open</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; open structure</li>
-<li><em>short1</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 1 short structure</li>
-<li><em>short2</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 2 short structure</li>
-<li><em>through</em> (<a title="nport.NPort" class="reference external" href="nport.html#nport.NPort"><tt class="xref docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; through structure</li>
-<li><em>alpha</em> (float) &#8211; compensation parameter to account for the imperfections
+<li><strong>simpleopen</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; simple open structure</li>
+<li><strong>simpleshort</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; simple short structure</li>
+<li><strong>open</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; open structure</li>
+<li><strong>short1</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 1 short structure</li>
+<li><strong>short2</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; port 2 short structure</li>
+<li><strong>through</strong> (<a class="reference internal" href="nport.html#nport.NPort" title="nport.NPort"><tt class="xref py py-class docutils literal"><span class="pre">nport.NPort</span></tt></a>) &#8211; through structure</li>
+<li><strong>alpha</strong> (<tt class="xref py py-class docutils literal"><span class="pre">float</span></tt>) &#8211; compensation parameter to account for the imperfections
 of the short standard when gaps become large</li>
+<li><strong>asymmetric</strong> (<tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt>) &#8211; use the generalized algorithm that also handles
+asymmetric test-fixtures (NOT VERIFIED!)</li>
 </ul>
 </td>
 </tr>
@@ -184,6 +206,28 @@ of the short standard when gaps become large</li>
 </table>
 </dd></dl>
 
+<table class="docutils citation" frame="void" id="van01" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[VAN01]</a></td><td>&#8220;Improved Three-Step De-Embedding Method to Accurately Account for
+the Influence of Pad Parasitics in Silicon On-Wafer RF
+Test-Structures&#8221;
+by Ewout P. Vandamme, Dominique M. M.-P. Schreurs,
+and Cees van Dinther
+in <em>IEEE Transactions on Electron Devices</em>,
+vol. 48, no. 4, pp. 737-742, 2001</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="kol00" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[KOL00]</a></td><td>&#8220;A Four-Step Method for De-Embedding Gigahertz On-Wafer CMOS
+Measurements&#8221;
+by Troels Emil Kolding
+in <em>IEEE Transactions on Electron Devices</em>,
+vol. 47, no. 4, pp. 734-740, 2000</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -194,44 +238,45 @@ of the short standard when gaps become large</li>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">nport.deemb</span></tt> &#8212; De-embedding tools</a><ul>
-<li><a class="reference external" href="#introduction">Introduction</a></li>
-<li><a class="reference external" href="#de-embedding-methods">De-embedding methods</a><ul>
-<li><a class="reference external" href="#two-step-de-embedding">Two-step de-embedding</a></li>
-<li><a class="reference external" href="#vandamme-three-step-de-embedding">Vandamme three-step de-embedding</a></li>
-<li><a class="reference external" href="#kolding-four-step-de-embedding">Kolding four-step de-embedding</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">nport.deemb</span></tt> &#8212; De-embedding tools</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#de-embedding-methods">De-embedding methods</a><ul>
+<li><a class="reference internal" href="#two-step-de-embedding">Two-step de-embedding</a></li>
+<li><a class="reference internal" href="#vandamme-three-step-de-embedding">Vandamme three-step de-embedding</a></li>
+<li><a class="reference internal" href="#kolding-four-step-de-embedding">Kolding four-step de-embedding</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="tline.html"
-                                  title="previous chapter"><tt class="docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines</a></p>
-            <h4>Next topic</h4>
-            <p class="topless"><a href="formats.html"
-                                  title="next chapter">Formats</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/deemb.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tline.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">nport.tline</span></tt> &#8212; Transmission lines</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="formats.html"
+                        title="next chapter">Formats</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/deemb.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -243,7 +288,7 @@ of the short standard when gaps become large</li>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="formats.html" title="Formats"
@@ -251,13 +296,13 @@ of the short standard when gaps become large</li>
         <li class="right" >
           <a href="tline.html" title="nport.tline — Transmission lines"
              >previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li>
           <li><a href="modules.html" >Modules</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Brecht Machiels.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+        &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
     </div>
   </body>
 </html>

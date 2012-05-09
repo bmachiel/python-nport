@@ -3,8 +3,14 @@
     You can adapt this file completely to your liking, but it should at least
     contain the root `toctree` directive.
 
-nport
-=====
+:mod:`nport` --- Work with n-port and 2n-port data
+==================================================
+
+:Author: Brecht Machiels <brecht.machiels at esat.kuleuven.be>
+:Release: |release|
+:Date: |today|
+:Homepage: http://bmachiel.github.com/python-nport
+:License: GPL v3
 
 Contents
 --------
@@ -14,6 +20,7 @@ Contents
 
     intro
     setup
+    tutorial
     modules
     formats
     nporttool

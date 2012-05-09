@@ -14,7 +14,11 @@ functions provided by the :mod:`nport` python package.
 Functions
 ---------
 
-The following are the functions supported by :program:`nporttool`.
+The following are the functions supported by :program:`nporttool`:
+
+* :ref:`file_conversion`
+* :ref:`port_recombination`
+
 
 .. _file_conversion:
 
@@ -75,10 +79,8 @@ Invoke :program:`nporttool` like this::
 
     Set the output format to *format*. *format* can be one of:
     
-    ``tstone``
-        Touchstone
-    ``citi``
-        CITI
+    * ``tstone`` --- :ref:`Touchstone <touchstone>`
+    * ``citi`` --- :ref:`CITI <citi>`
     
     .. seealso::
         :ref:`file_conversion`

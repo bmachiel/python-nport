@@ -1,3 +1,5 @@
+.. _citi:
+
 :mod:`nport.citi` --- CITI
 ==========================
 
@@ -9,6 +11,6 @@
 Functions
 ---------
 
-.. autofunction:: nport.citi.read
+.. autofunction:: read
 
-.. autofunction:: nport.citi.write
+.. autofunction:: write

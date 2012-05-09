@@ -9,7 +9,7 @@ Interface
 
 .. function:: read(file_path, verbose=False)
 
-.. function:: write(instance, file_path, format):
+.. function:: write(instance, file_path, format)
 
 
 Supported formats

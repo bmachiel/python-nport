@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -5,22 +7,23 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>nporttool — Command line nport &mdash; nport v0.1 documentation</title>
+    <title>nporttool — Command line nport &mdash; nport v0.1-73-g7443 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1',
-        COLLAPSE_MODINDEX: false,
+        VERSION:     '0.1-73-g7443',
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/jsMath-3.6e/easy/load.js"></script>
-    <link rel="top" title="nport v0.1 documentation" href="index.html" />
+    <link rel="top" title="nport v0.1-73-g7443 documentation" href="index.html" />
     <link rel="prev" title="nport.citi — CITI" href="citi.html" /> 
   </head>
   <body>
@@ -31,12 +34,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="citi.html" title="nport.citi — CITI"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -46,16 +49,20 @@
           <div class="body">
             
   <div class="section" id="nporttool-command-line-nport">
-<h1><strong>nporttool</strong> &#8212; Command line nport<a class="headerlink" href="#nporttool-command-line-nport" title="Permalink to this headline">¶</a></h1>
-<p>The command line tool <strong>nporttool</strong> enables to perform a subset of the
-functions provided by the <a title="n-ports and 2n-ports" class="reference external" href="nport.html#module-nport"><tt class="xref docutils literal"><span class="pre">nport</span></tt></a> python package.</p>
+<h1><strong class="program">nporttool</strong> &#8212; Command line nport<a class="headerlink" href="#nporttool-command-line-nport" title="Permalink to this headline">¶</a></h1>
+<p>The command line tool <strong class="program">nporttool</strong> enables to perform a subset of the
+functions provided by the <a class="reference internal" href="nport.html#module-nport" title="nport: n-ports and 2n-ports"><tt class="xref py py-mod docutils literal"><span class="pre">nport</span></tt></a> python package.</p>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<p>The following are the functions supported by <strong>nporttool</strong>.</p>
+<p>The following are the functions supported by <strong class="program">nporttool</strong>:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#file-conversion"><em>File Conversion</em></a></li>
+<li><a class="reference internal" href="#port-recombination"><em>Port Recombination</em></a></li>
+</ul>
 <div class="section" id="file-conversion">
 <span id="id1"></span><h3>File Conversion<a class="headerlink" href="#file-conversion" title="Permalink to this headline">¶</a></h3>
-<p><strong>nporttool</strong> automatically detects the input file format. Using the
-<a class="reference internal" href="#cmdoption-nporttool-f"><em class="xref">-f</em></a> option, it is possible to specify the format of the output file.
+<p><strong class="program">nporttool</strong> automatically detects the input file format. Using the
+<a class="reference internal" href="#cmdoption-nporttool-f"><em class="xref std std-option">-f</em></a> option, it is possible to specify the format of the output file.
 The default output format is Touchstone. Do not specify the extension of the
 output file, it is added automatically.</p>
 <div class="admonition warning">
@@ -71,7 +78,7 @@ the result to <tt class="docutils literal"><span class="pre">microstrip.citi</sp
 <div class="section" id="port-recombination">
 <span id="id2"></span><h3>Port Recombination<a class="headerlink" href="#port-recombination" title="Permalink to this headline">¶</a></h3>
 <p>It is possible to recombine some ports of the n-port described by the
-S-parameters. The argument to the <a class="reference internal" href="#cmdoption-nporttool-r"><em class="xref">-r</em></a> option is a a list of
+S-parameters. The argument to the <a class="reference internal" href="#cmdoption-nporttool-r"><em class="xref std std-option">-r</em></a> option is a a list of
 integers and pairs of integers. An integer specifies the number of the port
 that needs to be kept as-is. If the integer is negative, the port&#8217;s polarity
 is reversed. A pair of integers specifies a pair of ports that is to be
@@ -94,7 +101,7 @@ out, practically appearing as open-circuited.</p>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>Invoke <strong>nporttool</strong> like this:</p>
+<p>Invoke <strong class="program">nporttool</strong> like this:</p>
 <div class="highlight-none"><div class="highlight"><pre>nporttool [-c portlist] [-f format] &lt;file&gt;
 </pre></div>
 </div>
@@ -104,12 +111,10 @@ out, practically appearing as open-circuited.</p>
 <dt id="cmdoption-nporttool--format">
 <tt class="descname">--format</tt><tt class="descclassname"> &lt;format&gt;</tt><a class="headerlink" href="#cmdoption-nporttool--format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the output format to <em>format</em>. <em>format</em> can be one of:</p>
-<dl class="docutils">
-<dt><tt class="docutils literal"><span class="pre">tstone</span></tt></dt>
-<dd>Touchstone</dd>
-<dt><tt class="docutils literal"><span class="pre">citi</span></tt></dt>
-<dd>CITI</dd>
-</dl>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">tstone</span></tt> &#8212; <a class="reference internal" href="touchstone.html#touchstone"><em>Touchstone</em></a></li>
+<li><tt class="docutils literal"><span class="pre">citi</span></tt> &#8212; <a class="reference internal" href="citi.html#citi"><em>CITI</em></a></li>
+</ul>
 <div class="admonition-see-also admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#file-conversion"><em>File Conversion</em></a></p>
@@ -133,14 +138,16 @@ out, practically appearing as open-circuited.</p>
 <tt class="descname">-h</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-nporttool-h" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption-nporttool--help">
 <tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-nporttool--help" title="Permalink to this definition">¶</a></dt>
-<dd>Print a short description of all command line options.</dd></dl>
+<dd><p>Print a short description of all command line options.</p>
+</dd></dl>
 
 <dl class="cmdoption">
 <dt id="cmdoption-nporttool-v">
 <tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-nporttool-v" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption-nporttool--verbose">
 <tt class="descname">--verbose</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-nporttool--verbose" title="Permalink to this definition">¶</a></dt>
-<dd>Be verbose.</dd></dl>
+<dd><p>Be verbose.</p>
+</dd></dl>
 
 </div>
 </div>
@@ -151,40 +158,40 @@ out, practically appearing as open-circuited.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="#"><strong>nporttool</strong> &#8212; Command line nport</a><ul>
-<li><a class="reference external" href="#functions">Functions</a><ul>
-<li><a class="reference external" href="#file-conversion">File Conversion</a></li>
-<li><a class="reference external" href="#port-recombination">Port Recombination</a></li>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><strong class="program">nporttool</strong> &#8212; Command line nport</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#file-conversion">File Conversion</a></li>
+<li><a class="reference internal" href="#port-recombination">Port Recombination</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
 </ul>
 
-            <h4>Previous topic</h4>
-            <p class="topless"><a href="citi.html"
-                                  title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">nport.citi</span></tt> &#8212; CITI</a></p>
-            <h3>This Page</h3>
-            <ul class="this-page-menu">
-              <li><a href="_sources/nporttool.txt"
-                     rel="nofollow">Show Source</a></li>
-            </ul>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="citi.html"
+                        title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">nport.citi</span></tt> &#8212; CITI</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/nporttool.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -196,17 +203,17 @@ out, practically appearing as open-circuited.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
+          <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="citi.html" title="nport.citi — CITI"
              >previous</a> |</li>
-        <li><a href="index.html">nport v0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">nport v0.1-73-g7443 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Brecht Machiels.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.7.
+        &copy; Copyright 2010, Brecht Machiels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.4.
     </div>
   </body>
 </html>
