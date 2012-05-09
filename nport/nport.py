@@ -653,8 +653,8 @@ def dot(arg1, arg2):
                 zip(arg1_matrices, arg2_matrices)])
         else:
             result_freqs = arg1.freqs
-            result_matrices = np.array([np.dot(matrix, other)
-                for matrix in arg1.matrices])
+            result_matrices = np.array([np.dot(matrix, arg2)
+                                        for matrix in arg1])
         return NPort(result_freqs, result_matrices, arg1.type, arg1.z0)
     elif isinstance(arg1, TwoNPort):
         if isinstance(arg2, TwoNPort):
