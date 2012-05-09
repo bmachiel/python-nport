@@ -6,6 +6,7 @@ from .base import Z, Y, S, T, H, G, ABCD
 from .base import IMPEDANCE, ADMITTANCE, SCATTERING, SCATTERING_TRANSFER
 from .base import HYBRID, INVERSE_HYBRID, TRANSMISSION 
 from .nport import NPortMatrix, NPort
+from .tline import GammaZ0TransmissionLine, unwrap_sqrt, unwrap_log
 
 
 class TwoPortMatrix(NPortMatrix):
@@ -345,6 +346,38 @@ class TwoPort(NPort):
 
     def stability_circle_load(self):
         return stability_circle_load(self)
+
+    def transmission_line(self, length, reciprocal=True):
+        """Returns a :class:`TransmissionLine` represented by this
+        :class:`TwoPort`
+        
+        :param length: physical length of the transmission line in meters
+        :type length: :class:`float`
+        :param reciprocal: specifies whether this TwoPort represents a reciprocal
+                           transmission line (speeds up calculations)
+        :type twonport: :class:`bool`
+        
+        """
+        a, b, c, d = self.convert(TRANSMISSION).parameters
+        sum = a + d
+        diff = a - d
+        ad_bc = a * d - b * c
+        sq = unwrap_sqrt(sum**2 - 4 * ad_bc)
+
+        exp_mgl_forward = 2 / (sum + sq)
+        gamma_forward = - unwrap_log(exp_mgl_forward) / length
+        z0_forward = (diff + sq) / (2 * c)
+
+        if reciprocal:
+            return GammaZ0TransmissionLine(self.freqs, gamma_forward,
+                                           z0_forward)
+        else:
+            exp_mgl_backward = (sum - sq) / 2
+            gamma_backward = - unwrap_log(exp_mgl_backward) / length
+            z0_backward = (sq - diff) / (2 * c)
+            return  GammaZ0TransmissionLine(self.freqs, gamma_forward,
+                                           z0_forward, gamma_backward,
+                                           z0_backward)
 
 
 def stability_k(twoport):
