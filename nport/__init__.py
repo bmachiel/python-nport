@@ -35,6 +35,7 @@ from .base import Z, Y, S, T, H, G, ABCD
 from .base import IMPEDANCE, ADMITTANCE, SCATTERING, SCATTERING_TRANSFER
 from .base import HYBRID, INVERSE_HYBRID, TRANSMISSION 
 from .nport import NPortMatrix, NPort, dot
+from .twoport import TwoPortMatrix, TwoPort
 from .twonport import TwoNPortMatrix, TwoNPort
 
 from . import deemb
