@@ -16,7 +16,7 @@ class TransmissionLine(object):
                                   :attr:`cpm`)
 
     """
-    def __init__(self, twonport, length):
+    def __init__(self, twonport, length, reciprocal=True):
         """
         :param twonport: 2-port that represents a transmission line
         :type twonport: TwoNPort
@@ -36,30 +36,38 @@ class TransmissionLine(object):
         self.c = self.twonport.get_parameter(2, 1)[:,0,0]
         self.d = self.twonport.get_parameter(2, 2)[:,0,0]
 
-        # the arccosh can be implemented in a number of different ways
-        numpy_acosh = np.arccosh
+        sum = (self.a + self.d) / 2.0
+        ad_bc = self.a * self.d - self.b * self.c
+       
+        delta = unwrap_sqrt(sum**2 - ad_bc)
+        exp_gl_forward = sum + delta
+        exp_gl_backward = sum - delta
 
-        def mathworld_acosh(z):
-            # http://mathworld.wolfram.com/InverseHyperbolicCosine.html
-            return np.log(z + np.sqrt(z + 1) * np.sqrt(z - 1))
-
-        def matlab_acosh(z):
-            #MATLAB
-            return np.log(z + np.sqrt(z*z - 1))
-            
-        acosh = matlab_acosh
-
-        tmp = (self.a + self.d) / 2.0
-        self._gamma = acosh(tmp) / self.length
-        self._z0 = np.sqrt(self.b / self.c)
-
-        # TODO: unwrap gamma (*before* division by length)
+        # debug info
+        self.delta_pre = sum**2 - ad_bc
+        self.delta = delta
+        self.exp_gl_forward = exp_gl_forward
+        self.exp_gl_backward = exp_gl_backward
         
+        self._gamma_forward = unwrap_log(exp_gl_forward) / self.length
+        self._gamma_backward = - unwrap_log(exp_gl_backward) / self.length
+
+        self._z0_forward = (exp_gl_forward - self.d) / self.c
+        self._z0_backward = (self.d - exp_gl_backward) / self.c
+
+        #self._z0_forward_alt = self.b / (exp_gl_forward - self.a)
+        #self._z0_backward_alt = self.b / (self.a - exp_gl_backward)
+
         # extract RLGC parameters [EIS92]
-        self._rpm = (self.gamma * self.z0).real
-        self._lpm = (self.gamma * self.z0).imag / (2 * np.pi * self.freqs)
-        self._gpm = (self.gamma / self.z0).real
-        self._cpm = (self.gamma / self.z0).imag / (2 * np.pi * self.freqs)
+        self._rpm_forward = (self._gamma_forward * self._z0_forward).real
+        self._lpm_forward = (self._gamma_forward * self._z0_forward).imag / (2 * np.pi * self.freqs)
+        self._gpm_forward = (self._gamma_forward / self._z0_forward).real
+        self._cpm_forward = (self._gamma_forward / self._z0_forward).imag / (2 * np.pi * self.freqs)
+
+        self._rpm_backward = (self._gamma_backward * self._z0_backward).real
+        self._lpm_backward = (self._gamma_backward * self._z0_backward).imag / (2 * np.pi * self.freqs)
+        self._gpm_backward = (self._gamma_backward / self._z0_backward).real
+        self._cpm_backward = (self._gamma_backward / self._z0_backward).imag / (2 * np.pi * self.freqs)
 
     @property
     def gamma(self):
@@ -90,3 +98,15 @@ class TransmissionLine(object):
     def cpm(self):
         """Capacitance per meter"""
         return self._cpm
+
+
+def unwrap_sqrt(arg):
+    """square root of complex numbers (first unwrap)"""
+    mag, ang = np.abs(arg), np.unwrap(np.angle(arg))
+    return np.sqrt(mag) * np.exp(1j * ang / 2)
+
+
+def unwrap_log(arg):
+    """natural logarithm of complex numbers (first unwrap)"""
+    mag, ang = np.abs(arg), np.unwrap(np.angle(arg))
+    return np.log(mag) + 1j * ang
