@@ -59,15 +59,21 @@ class TransmissionLine(object):
         #self._z0_backward_alt = self.b / (self.a - exp_gl_backward)
 
         # extract RLGC parameters [EIS92]
-        self._rpm_forward = (self._gamma_forward * self._z0_forward).real
-        self._lpm_forward = (self._gamma_forward * self._z0_forward).imag / (2 * np.pi * self.freqs)
-        self._gpm_forward = (self._gamma_forward / self._z0_forward).real
-        self._cpm_forward = (self._gamma_forward / self._z0_forward).imag / (2 * np.pi * self.freqs)
+        two_pi_f = 2 * np.pi * self.freqs
+        gamma_mul_z0_forward = self._gamma_forward * self._z0_forward
+        gamma_div_z0_forward = self._gamma_forward / self._z0_forward
+        gamma_mul_z0_backward = self._gamma_backward * self._z0_backward
+        gamma_div_z0_backward = self._gamma_backward / self._z0_backward
 
-        self._rpm_backward = (self._gamma_backward * self._z0_backward).real
-        self._lpm_backward = (self._gamma_backward * self._z0_backward).imag / (2 * np.pi * self.freqs)
-        self._gpm_backward = (self._gamma_backward / self._z0_backward).real
-        self._cpm_backward = (self._gamma_backward / self._z0_backward).imag / (2 * np.pi * self.freqs)
+        self._rpm_forward = gamma_mul_z0_forward.real
+        self._lpm_forward = gamma_mul_z0_forward.imag / two_pi_f
+        self._gpm_forward = gamma_div_z0_forward.real
+        self._cpm_forward = gamma_div_z0_forward.imag / two_pi_f
+
+        self._rpm_backward = gamma_mul_z0_backward.real
+        self._lpm_backward = gamma_mul_z0_backward.imag / two_pi_f
+        self._gpm_backward = gamma_div_z0_backward.real
+        self._cpm_backward = gamma_div_z0_backward.imag / two_pi_f
 
     @property
     def gamma(self):
