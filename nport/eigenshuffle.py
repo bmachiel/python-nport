@@ -140,6 +140,9 @@ def eigenshuffle(Asequence):
      [ 0.63271  0.09231  0.75026  0.16815]]
 
     """
+    # alternative implementations:
+    #  * http://www.mathworks.com/matlabcentral/fileexchange/29463-eigenshuffle2
+    #  * http://www.mathworks.com/matlabcentral/fileexchange/29464-rootshuffle-m ?
     
     # Is Asequence a 3-d array?
     Ashape = np.shape(Asequence)
