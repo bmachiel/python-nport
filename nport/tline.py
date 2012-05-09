@@ -37,26 +37,18 @@ class TransmissionLine(object):
         self.d = self.twonport.get_parameter(2, 2)[:,0,0]
 
         sum = (self.a + self.d) / 2.0
+        diff = (self.d - self.a) / 2.0
         ad_bc = self.a * self.d - self.b * self.c
        
         delta = unwrap_sqrt(sum**2 - ad_bc)
-        exp_gl_forward = sum + delta
-        exp_gl_backward = sum - delta
+        exp_gl_forward = (sum + delta) / ad_bc
+        exp_gl_backward = (sum - delta) / ad_bc
 
-        # debug info
-        self.delta_pre = sum**2 - ad_bc
-        self.delta = delta
-        self.exp_gl_forward = exp_gl_forward
-        self.exp_gl_backward = exp_gl_backward
-        
         self._gamma_forward = unwrap_log(exp_gl_forward) / self.length
         self._gamma_backward = - unwrap_log(exp_gl_backward) / self.length
 
-        self._z0_forward = (exp_gl_forward - self.d) / self.c
-        self._z0_backward = (self.d - exp_gl_backward) / self.c
-
-        #self._z0_forward_alt = self.b / (exp_gl_forward - self.a)
-        #self._z0_backward_alt = self.b / (self.a - exp_gl_backward)
+        self._z0_forward = - self.b / (diff - delta)
+        self._z0_backward = self.b / (diff + delta)
 
         # extract RLGC parameters [EIS92]
         two_pi_f = 2 * np.pi * self.freqs
