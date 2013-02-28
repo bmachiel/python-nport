@@ -15,7 +15,7 @@ def read(file_path, verbose=False):
     """
     file_path = os.path.abspath(file_path)
     citifile = CITIFile(file_path)
-    assert citifile.params[0][0][0] == "freq"
+    assert citifile.params[0][0][0].lower() == "freq"
     freqs = citifile.data[0][0]
     ports = np.sqrt(len(citifile.params[0]) - 1)
     assert ports == int(ports)
