@@ -65,7 +65,7 @@ def eigenshuffle(Asequence):
     To see that eigenshuffle has done its work correctly, look at the
     eigenvalues in sequence, after the shuffle.
     
-    >>> print np.hstack([np.asarray([tseq]).T, Dseq]).astype(float)
+    >>> print(np.hstack([np.asarray([tseq]).T, Dseq]).astype(float))
         
     [[-1.      8.4535  5.      2.3447  0.2018]
      [-0.9     7.8121  4.7687  2.3728  0.4464]
@@ -147,7 +147,7 @@ def eigenshuffle(Asequence):
     # Is Asequence a 3-d array?
     Ashape = np.shape(Asequence)
     if Ashape[-1] != Ashape[-2]:
-        raise Exception, ("Asequence must be a (nxpxp) array of "
+        raise Exception("Asequence must be a (nxpxp) array of "
                           "eigen-problems, each of size pxp")
     p = Ashape[-1]
     if len(Ashape) < 3:
@@ -167,7 +167,7 @@ def eigenshuffle(Asequence):
         # real part.
         tags = np.argsort(D.real, axis=0)[::-1]
         
-        Dseq[i] = D[:, tags]
+        Dseq[i] = D[tags]
         Vseq[i] = V[:, tags]
     
     # now, treat each eigenproblem in sequence (after the first one.)
@@ -194,7 +194,7 @@ def eigenshuffle(Asequence):
         # were consistent if possible
         S = np.squeeze( np.sum( Vseq[i - 1] * Vseq[i], 0 ).real ) < 0
        
-        Vseq[i] = Vseq[i] * (-S * 2 - 1)
+        Vseq[i] = Vseq[i] * (~S * 2 - 1)
 
     return Dseq, Vseq
 
@@ -203,3 +203,4 @@ def distancematrix(vec1, vec2):
     """simple interpoint distance matrix"""
     v1, v2 = np.meshgrid(vec1, vec2)
     return np.abs(v1 - v2)
+
